@@ -1,17 +1,31 @@
 from typing import List
 
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, Request
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware import Middleware
+from starlette.responses import JSONResponse
 
-from app.routers.health import health_router
-from app.routers.predict import predict_router
-from app.routers.information import information_router
+from src.core.middlewares.auth_middleware import AuthenticationMiddleware, AuthBackend
+from src.core.exceptions.base import CustomException
+from src.health.routers import health_router
 
-# Configure web domain which can access api
+# web domain which can access api
 origins = [
     "*",
 ]
+
+
+def on_auth_error(request: Request, exc: Exception):
+    status_code, error_code, message = 401, None, str(exc)
+    if isinstance(exc, CustomException):
+        status_code = int(exc.code)
+        error_code = exc.error_code
+        message = exc.message
+
+    return JSONResponse(
+        status_code=status_code,
+        content={"error_code": error_code, "message": message},
+    )
 
 
 def make_middleware() -> List[Middleware]:
@@ -23,6 +37,11 @@ def make_middleware() -> List[Middleware]:
             allow_methods=["*"],
             allow_headers=["*"],
         ),
+        Middleware(
+            AuthenticationMiddleware,
+            backend=AuthBackend(),
+            on_error=on_auth_error
+        )
     ]
     return middleware
 
@@ -30,8 +49,6 @@ def make_middleware() -> List[Middleware]:
 def init_routers(app_: FastAPI) -> None:
     prefix_router = APIRouter(prefix="/api/v1")
     prefix_router.include_router(health_router)
-    prefix_router.include_router(predict_router)
-    prefix_router.include_router(information_router)
 
     app_.include_router(prefix_router)
 

@@ -26,7 +26,7 @@ def upgrade() -> None:
     sa.Column('username', sa.String(), nullable=False),
     sa.Column('email', sa.String(), nullable=False),
     sa.Column('full_name', sa.String(), nullable=False),
-    sa.Column('hashed_password', sa.String(), nullable=False),
+    sa.Column('password', sa.String(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
@@ -67,4 +67,5 @@ def downgrade() -> None:
     op.drop_index('idx_solar_panels_location', table_name='solar_panels', postgresql_using='gist')
     op.drop_table('solar_panels')
     op.drop_table('users')
+    op.execute("DROP TYPE panelstatus")
     # ### end Alembic commands ###

@@ -1,13 +1,12 @@
-# models.py
 import enum
 
 from sqlalchemy import (
     Column, Integer, String, Float, DateTime, ForeignKey, func, Enum
 )
-from sqlalchemy.orm import declarative_base, relationship
+from sqlalchemy.orm import relationship
 from geoalchemy2 import Geometry
 
-Base = declarative_base()
+from src.core.db.session import Base
 
 
 class PanelStatus(enum.Enum):
@@ -55,23 +54,4 @@ class SolarPanel(Base):
     def __repr__(self):
         return (f"<SolarPanel(id={self.id}, serial_number={self.serial_number}, "
                 f"manufacturer={self.manufacturer}, model={self.model}, "
-                f"kwp={self.kwp})>")
-
-
-class User(Base):
-    __tablename__ = 'users'
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    username = Column(String, unique=True, nullable=False)
-    email = Column(String, unique=True, nullable=False)
-    full_name = Column(String, nullable=False)
-    hashed_password = Column(String, nullable=False)
-
-    # Relationships
-    solar_panels = relationship("SolarPanel", back_populates="user")
-
-    created_at = Column(DateTime, default=func.now())
-    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
-
-    def __repr__(self):
-        return f"<User(id={self.id}, username={self.username}, email={self.email})>"
+                f"kwp={self.capacity_kw})>")

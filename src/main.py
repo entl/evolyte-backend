@@ -8,6 +8,11 @@ from starlette.responses import JSONResponse
 from src.core.middlewares.auth_middleware import AuthenticationMiddleware, AuthBackend
 from src.core.exceptions.base import CustomException
 from src.health.routers import health_router
+from src.user.routers import users_router
+
+# index models
+from src.models import SolarPanel
+from src.user.models import User
 
 # web domain which can access api
 origins = [
@@ -46,9 +51,19 @@ def make_middleware() -> List[Middleware]:
     return middleware
 
 
+def init_listeners(app_: FastAPI) -> None:
+    @app_.exception_handler(CustomException)
+    async def custom_exception_handler(request: Request, exc: CustomException):
+        return JSONResponse(
+            status_code=exc.code,
+            content={"error_code": exc.error_code, "message": exc.message},
+        )
+
+
 def init_routers(app_: FastAPI) -> None:
     prefix_router = APIRouter(prefix="/api/v1")
     prefix_router.include_router(health_router)
+    prefix_router.include_router(users_router)
 
     app_.include_router(prefix_router)
 
@@ -62,6 +77,7 @@ def create_app():
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    init_listeners(app_=app_)
     init_routers(app_=app_)
 
     return app_

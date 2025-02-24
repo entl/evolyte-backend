@@ -19,23 +19,23 @@ class UserService:
         return [UserOut.model_validate(user) for user in users]
 
     def get_user_by_id(self, user_id: int) -> Optional[UserOut]:
-        user = self.uow.users.get_by_id(user_id)
+        user = self.uow.users.get_by(id=user_id)
         return UserOut.model_validate(user) if user else None
 
     def get_user_by_username(self, username: str) -> Optional[UserOut]:
-        user = self.uow.users.get_by_username(username)
+        user = self.uow.users.get_by(username=username)
         return UserOut.model_validate(user) if user else None
 
     def get_user_by_email(self, email: str) -> Optional[UserOut]:
-        user = self.uow.users.get_by_email(email)
+        user = self.uow.users.get_by(email=email)
         return UserOut.model_validate(user) if user else None
 
     def create_user(self, user: UserCreate) -> UserOut:
         with self.uow:
             # Check for duplicate username or email
-            if self.uow.users.get_by_username(user.username):
+            if self.uow.users.get_by(username=user.username):
                 raise DuplicateEmailOrUsernameException()
-            if self.uow.users.get_by_email(user.email):
+            if self.uow.users.get_by(email=user.email):
                 raise DuplicateEmailOrUsernameException()
 
             # Hash the password before storing
@@ -50,7 +50,7 @@ class UserService:
     def update_user(self, user_update: UserUpdate) -> UserOut:
         with self.uow:
             # Retrieve the existing user
-            user = self.uow.users.get_by_id(user_update.id)
+            user = self.uow.users.get_by(id=user_update.id)
             if not user:
                 raise UserNotFoundException()
 
@@ -64,7 +64,7 @@ class UserService:
             return UserOut.model_validate(updated_user)
 
     def login(self, email: str, password: str) -> LoginResponse:
-        user = self.uow.users.get_by_email(email)
+        user = self.uow.users.get_by(email=email)
         if not user:
             raise UserNotFoundException()
         if not password_helper.verify(password, user.password):
@@ -77,7 +77,7 @@ class UserService:
         )
 
     def is_admin(self, user_id: int) -> bool:
-        user = self.uow.users.get_by_id(user_id)
+        user = self.uow.users.get_by(id=user_id)
         if not user:
             raise UserNotFoundException()
 
@@ -88,7 +88,7 @@ class UserService:
 
     def delete_user(self, user_id: int) -> None:
         with self.uow:
-            user = self.uow.users.get_by_id(user_id)
+            user = self.uow.users.get_by(id=user_id)
             if not user:
                 raise UserNotFoundException()
 

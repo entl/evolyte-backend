@@ -12,7 +12,7 @@ from src.user.routers import users_router
 from src.auth.routers import auth_router
 
 # index models
-from src.models import SolarPanel
+from src.solar_panels.models import SolarPanel
 from src.user.models import User
 
 # web domain which can access api

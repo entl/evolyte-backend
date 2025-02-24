@@ -46,10 +46,8 @@ class UnitOfWork(UnitOfWorkBase):
     def __exit__(self, exc_type, exc_val, exc_tb):
         try:
             if exc_type:
-                print(f"Rolling back transaction due to: {exc_type.__name__}: {exc_val}")
                 self.rollback()
             else:
-                print("Committing transaction")
                 self.commit()
         finally:
             self.close()

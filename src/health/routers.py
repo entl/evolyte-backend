@@ -8,5 +8,5 @@ health_router = APIRouter(prefix="/health", tags=["Health"])
     "",
     status_code=status.HTTP_200_OK,
 )
-async def health():
+def health():
     return {"status": "ok"}

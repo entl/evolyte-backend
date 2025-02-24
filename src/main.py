@@ -9,6 +9,7 @@ from src.core.middlewares.auth_middleware import AuthenticationMiddleware, AuthB
 from src.core.exceptions.base import CustomException
 from src.health.routers import health_router
 from src.user.routers import users_router
+from src.auth.routers import auth_router
 
 # index models
 from src.models import SolarPanel
@@ -64,6 +65,7 @@ def init_routers(app_: FastAPI) -> None:
     prefix_router = APIRouter(prefix="/api/v1")
     prefix_router.include_router(health_router)
     prefix_router.include_router(users_router)
+    prefix_router.include_router(auth_router)
 
     app_.include_router(prefix_router)
 

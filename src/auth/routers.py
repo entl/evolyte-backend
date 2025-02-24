@@ -7,7 +7,7 @@ from starlette import status
 from .schemas import RefreshTokenRequest, RefreshTokenResponse, VerifyTokenRequest
 from .service import JwtService
 from src.user.schemas import LoginResponse
-from src.user.service import UserService
+from src.core.dependencies.user import UserServiceDep
 
 auth_router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -16,19 +16,19 @@ auth_router = APIRouter(prefix="/auth", tags=["Auth"])
     "/refresh",
     response_model=RefreshTokenResponse,
 )
-async def refresh_token(request: RefreshTokenRequest):
-    token = await JwtService().create_refresh_token(
+def refresh_token(request: RefreshTokenRequest):
+    token = JwtService().create_refresh_token(
         token=request.token, refresh_token=request.refresh_token
     )
     return {"token": token.token, "refresh_token": token.refresh_token}
 
 
 @auth_router.post("/verify", status_code=status.HTTP_200_OK)
-async def verify_token(request: VerifyTokenRequest):
-    await JwtService().verify_token(token=request.token)
+def verify_token(request: VerifyTokenRequest):
+    JwtService().verify_token(token=request.token)
 
 
 @auth_router.post("/login", response_model=LoginResponse, status_code=status.HTTP_200_OK)
-async def login(user_credentials: Annotated[OAuth2PasswordRequestForm, Depends()]):
-    token = await UserService().login(email=user_credentials.username, password=user_credentials.password)
+def login(user_credentials: Annotated[OAuth2PasswordRequestForm, Depends()], user_service: UserServiceDep):
+    token = user_service.login(email=user_credentials.username, password=user_credentials.password)
     return token

@@ -5,10 +5,10 @@ from src.core.utils.token_helper import TokenHelper
 
 
 class JwtService:
-    async def verify_token(self, token: str) -> None:
+    def verify_token(self, token: str) -> None:
         TokenHelper.decode(token=token)
 
-    async def create_refresh_token(
+    def create_refresh_token(
         self,
         token: str,
         refresh_token: str,

@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.ext.declarative import DeclarativeMeta
 from typing import TypeVar
 
+from src.solar_panels.repository import SolarPanelRepository
 from src.user.repository import UserRepository
 
 # Generic type for database models
@@ -39,6 +40,7 @@ class UnitOfWork(UnitOfWorkBase):
     def __init__(self, session: Session):
         self.session = session
         self._user_repo = None
+        self._solar_panel_repo = None
 
     def __enter__(self):
         return self
@@ -61,8 +63,14 @@ class UnitOfWork(UnitOfWorkBase):
     def close(self):
         self.session.close()
 
+    def flush(self):
+        self.session.flush()
+
     def refresh(self, entity: T):
         self.session.refresh(entity)
+
+    def expunge(self, entity: T):
+        self.session.expunge(entity)
 
     # lazy loading of repositories
     @property
@@ -71,3 +79,8 @@ class UnitOfWork(UnitOfWorkBase):
             self._user_repo = UserRepository(self.session)
         return self._user_repo
 
+    @property
+    def solar_panels(self):
+        if self._solar_panel_repo is None:
+            self._solar_panel_repo = SolarPanelRepository(self.session)
+        return self._solar_panel_repo

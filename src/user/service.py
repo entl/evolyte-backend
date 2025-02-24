@@ -5,7 +5,6 @@ from .models import User
 from src.core.exceptions.user import UserNotFoundException, PasswordDoesNotMatchException
 from src.core.exceptions.user import DuplicateEmailOrUsernameException
 
-from src.core import exceptions
 from src.core.utils import password_helper
 from src.core.utils.token_helper import TokenHelper
 from src.core.db.uow import UnitOfWork
@@ -34,9 +33,9 @@ class UserService:
     def create_user(self, user: UserCreate) -> UserOut:
         with self.uow:
             # Check for duplicate username or email
-            if self.get_user_by_username(user.username):
+            if self.uow.users.get_by_username(user.username):
                 raise DuplicateEmailOrUsernameException()
-            if self.get_user_by_email(user.email):
+            if self.uow.users.get_by_email(user.email):
                 raise DuplicateEmailOrUsernameException()
 
             # Hash the password before storing
@@ -51,9 +50,9 @@ class UserService:
     def update_user(self, user_update: UserUpdate) -> UserOut:
         with self.uow:
             # Retrieve the existing user
-            user = self.get_user_by_id(user_update.id)
+            user = self.uow.users.get_by_id(user_update.id)
             if not user:
-                raise exceptions.user.UserNotFoundException()
+                raise UserNotFoundException()
 
             # Update only provided fields
             update_data = user_update.model_dump(exclude_none=True, exclude_unset=True)
@@ -65,7 +64,7 @@ class UserService:
             return UserOut.model_validate(updated_user)
 
     def login(self, email: str, password: str) -> LoginResponse:
-        user = self.get_user_by_email(email)
+        user = self.uow.users.get_by_email(email)
         if not user:
             raise UserNotFoundException()
         if not password_helper.verify(password, user.password):
@@ -78,9 +77,9 @@ class UserService:
         )
 
     def is_admin(self, user_id: int) -> bool:
-        user = self.get_user_by_id(user_id)
+        user = self.uow.users.get_by_id(user_id)
         if not user:
-            raise exceptions.user.UserNotFoundException()
+            raise UserNotFoundException()
 
         if user.role == "admin":
             return True
@@ -89,9 +88,9 @@ class UserService:
 
     def delete_user(self, user_id: int) -> None:
         with self.uow:
-            user = self.get_user_by_id(user_id)
+            user = self.uow.users.get_by_id(user_id)
             if not user:
-                raise exceptions.user.UserNotFoundException()
+                raise UserNotFoundException()
 
             self.uow.users.delete(user)
 

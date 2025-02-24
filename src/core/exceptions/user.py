@@ -10,8 +10,8 @@ class PasswordDoesNotMatchException(CustomException):
 
 class DuplicateEmailOrUsernameException(CustomException):
     code = status.HTTP_409_CONFLICT
-    error_code = "USER__DUPLICATE_EMAIL_OR_NICKNAME"
-    message = "duplicate email or nickname"
+    error_code = "USER__DUPLICATE_EMAIL_OR_USERNAME"
+    message = "duplicate email or username"
 
 
 class UserNotFoundException(CustomException):

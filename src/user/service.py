@@ -1,61 +1,57 @@
 from typing import Optional, List
-from pydantic import UUID4
-from sqlalchemy.orm import Session
-from .repository import UserRepository
 from .schemas import UserOut, UserCreate, UserUpdate, LoginResponse
 from .models import User
+
+from src.core.exceptions.user import UserNotFoundException, PasswordDoesNotMatchException
+from src.core.exceptions.user import DuplicateEmailOrUsernameException
+
 from src.core import exceptions
 from src.core.utils import password_helper
 from src.core.utils.token_helper import TokenHelper
+from src.core.db.uow import UnitOfWork
 
 
 class UserService:
-    def __init__(self, user_repository: UserRepository):
-        self.user_repository = user_repository
+    def __init__(self, uow: UnitOfWork):
+        self.uow = uow
 
     def get_all_users(self) -> List[UserOut]:
-        users = self.user_repository.get_all()
+        users = self.uow.users.get_all()
         return [UserOut.model_validate(user) for user in users]
 
-    def get_user_by_id(self, user_id: UUID4) -> Optional[UserOut]:
-        user = self.user_repository.get_by_id(user_id)
+    def get_user_by_id(self, user_id: int) -> Optional[UserOut]:
+        user = self.uow.users.get_by_id(user_id)
         return UserOut.model_validate(user) if user else None
 
     def get_user_by_username(self, username: str) -> Optional[UserOut]:
-        user = self.user_repository.get_by_username(username)
+        user = self.uow.users.get_by_username(username)
         return UserOut.model_validate(user) if user else None
 
     def get_user_by_email(self, email: str) -> Optional[UserOut]:
-        user = self.user_repository.get_by_email(email)
+        user = self.uow.users.get_by_email(email)
         return UserOut.model_validate(user) if user else None
 
     def create_user(self, user: UserCreate) -> UserOut:
-        try:
+        with self.uow:
             # Check for duplicate username or email
             if self.get_user_by_username(user.username):
-                raise exceptions.user.DuplicateEmailOrNicknameException()
+                raise DuplicateEmailOrUsernameException()
             if self.get_user_by_email(user.email):
-                raise exceptions.user.DuplicateEmailOrNicknameException()
+                raise DuplicateEmailOrUsernameException()
 
             # Hash the password before storing
             hashed_password = password_helper.hash(user.password)
             user.password = hashed_password
 
             new_user = User(**user.model_dump())
-            created_user = self.user_repository.create(new_user)
-
-            self.db_session.commit()  # Commit transaction
-            self.db_session.refresh(created_user)  # Ensure the latest data is reflected
+            created_user = self.uow.users.create(new_user)
 
             return UserOut.model_validate(created_user)
-        except Exception as e:
-            self.db_session.rollback()  # Rollback in case of failure
-            raise e
 
     def update_user(self, user_update: UserUpdate) -> UserOut:
-        try:
+        with self.uow:
             # Retrieve the existing user
-            user = self.user_repository.get_by_id(user_update.id)
+            user = self.get_user_by_id(user_update.id)
             if not user:
                 raise exceptions.user.UserNotFoundException()
 
@@ -64,22 +60,16 @@ class UserService:
             for key, value in update_data.items():
                 setattr(user, key, value)  # Update attributes dynamically
 
-            updated_user = self.user_repository.update(user)
-
-            self.db_session.commit()  # Commit transaction
-            self.db_session.refresh(updated_user)  # Ensure up-to-date state
+            updated_user = self.uow.users.update(user)
 
             return UserOut.model_validate(updated_user)
-        except Exception as e:
-            self.db_session.rollback()
-            raise e
 
     def login(self, email: str, password: str) -> LoginResponse:
-        user = self.user_repository.get_by_email(email)
+        user = self.get_user_by_email(email)
         if not user:
-            raise exceptions.user.UserNotFoundException()
+            raise UserNotFoundException()
         if not password_helper.verify(password, user.password):
-            raise exceptions.user.PasswordDoesNotMatchException()
+            raise PasswordDoesNotMatchException()
 
         return LoginResponse(
             access_token=TokenHelper.encode(payload={"user_id": str(user.id)}),
@@ -87,24 +77,23 @@ class UserService:
             token_type="bearer"
         )
 
-    def is_admin(self, user_id: str) -> bool:
-        user = self.user_repository.get_by_id(user_id)
+    def is_admin(self, user_id: int) -> bool:
+        user = self.get_user_by_id(user_id)
         if not user:
             raise exceptions.user.UserNotFoundException()
-        return getattr(user, "is_admin", False)
 
-    def delete_user(self, user_id: str) -> None:
-        try:
-            user = self.user_repository.get_by_id(user_id)
+        if user.role == "admin":
+            return True
+
+        return False
+
+    def delete_user(self, user_id: int) -> None:
+        with self.uow:
+            user = self.get_user_by_id(user_id)
             if not user:
                 raise exceptions.user.UserNotFoundException()
 
-            self.user_repository.delete(user)
-
-            self.db_session.commit()  # Commit transaction after deletion
-        except Exception as e:
-            self.db_session.rollback()
-            raise e
+            self.uow.users.delete(user)
 
     def logout(self) -> None:
         raise NotImplementedError("Logout functionality is not implemented yet.")

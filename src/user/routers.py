@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, status
 from pydantic import UUID4
 
-from src.user.schemas import UserCreate, UserOut, UserUpdate
+from src.user.schemas import UserCreate, UserResponse, UserUpdate
 from src.user.service import UserService
 
 from src.core.exceptions.user import InsufficientPermissions, UserNotFoundException
@@ -16,7 +16,7 @@ users_router = APIRouter(prefix="/users", tags=["Users"])
 
 @users_router.get(
     "/",
-    response_model=list[UserOut],
+    response_model=list[UserResponse],
     status_code=status.HTTP_200_OK,
     dependencies=[Depends(PermissionDependencyHTTP([IsAuthenticated]))]
 )
@@ -30,7 +30,7 @@ def get_all_users(user_service: UserServiceDep):
         user_service (UserService): User Service instance.
 
     Returns:
-        list[UserOut]: A list of all users in the database.
+        list[UserResponse]: A list of all users in the database.
     """
     users = user_service.get_all_users()
     return users
@@ -38,7 +38,7 @@ def get_all_users(user_service: UserServiceDep):
 
 @users_router.get(
     "/{user_id}",
-    response_model=UserOut,
+    response_model=UserResponse,
     status_code=status.HTTP_200_OK,
     dependencies=[Depends(PermissionDependencyHTTP([IsAuthenticated]))]
 )
@@ -53,7 +53,7 @@ def get_user_by_id(user_id: int, user_service: UserServiceDep):
         user_service (UserService): User Service instance.
 
     Returns:
-        UserOut: The user with the specified ID.
+        UserResponse: The user with the specified ID.
     """
     user = user_service.get_user_by_id(user_id=user_id)
     if not user:
@@ -64,7 +64,7 @@ def get_user_by_id(user_id: int, user_service: UserServiceDep):
 
 @users_router.post(
     "/",
-    response_model=UserOut,
+    response_model=UserResponse,
     status_code=status.HTTP_201_CREATED,
 )
 def create_user(user_service: UserServiceDep, user: UserCreate):
@@ -76,14 +76,14 @@ def create_user(user_service: UserServiceDep, user: UserCreate):
         user (UserCreate): User data to create.
 
     Returns:
-        UserOut: Created user data.
+        UserResponse: Created user data.
     """
     return user_service.create_user(user=user)
 
 
 @users_router.patch(
     "/",
-    response_model=UserOut,
+    response_model=UserResponse,
     status_code=status.HTTP_200_OK,
 )
 def update_user(
@@ -102,7 +102,7 @@ def update_user(
         current_user (CurrentUser): The currently authenticated user.
 
     Returns:
-        UserOut: Updated user data.
+        UserResponse: Updated user data.
     """
     if current_user.id == updated_user.id or Permissions.IsAdmin in current_user.permissions:
         return user_service.update_user(updated_user)

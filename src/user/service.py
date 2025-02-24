@@ -1,5 +1,5 @@
 from typing import Optional, List
-from .schemas import UserOut, UserCreate, UserUpdate, LoginResponse
+from .schemas import UserResponse, UserCreate, UserUpdate, LoginResponse
 from .models import User
 
 from src.core.exceptions.user import UserNotFoundException, PasswordDoesNotMatchException
@@ -14,23 +14,23 @@ class UserService:
     def __init__(self, uow: UnitOfWork):
         self.uow = uow
 
-    def get_all_users(self) -> List[UserOut]:
+    def get_all_users(self) -> List[UserResponse]:
         users = self.uow.users.get_all()
-        return [UserOut.model_validate(user) for user in users]
+        return [UserResponse.model_validate(user) for user in users]
 
-    def get_user_by_id(self, user_id: int) -> Optional[UserOut]:
+    def get_user_by_id(self, user_id: int) -> Optional[UserResponse]:
         user = self.uow.users.get_by(id=user_id)
-        return UserOut.model_validate(user) if user else None
+        return UserResponse.model_validate(user) if user else None
 
-    def get_user_by_username(self, username: str) -> Optional[UserOut]:
+    def get_user_by_username(self, username: str) -> Optional[UserResponse]:
         user = self.uow.users.get_by(username=username)
-        return UserOut.model_validate(user) if user else None
+        return UserResponse.model_validate(user) if user else None
 
-    def get_user_by_email(self, email: str) -> Optional[UserOut]:
+    def get_user_by_email(self, email: str) -> Optional[UserResponse]:
         user = self.uow.users.get_by(email=email)
-        return UserOut.model_validate(user) if user else None
+        return UserResponse.model_validate(user) if user else None
 
-    def create_user(self, user: UserCreate) -> UserOut:
+    def create_user(self, user: UserCreate) -> UserResponse:
         with self.uow:
             # Check for duplicate username or email
             if self.uow.users.get_by(username=user.username):
@@ -45,9 +45,9 @@ class UserService:
             new_user = User(**user.model_dump())
             created_user = self.uow.users.create(new_user)
 
-            return UserOut.model_validate(created_user)
+            return UserResponse.model_validate(created_user)
 
-    def update_user(self, user_update: UserUpdate) -> UserOut:
+    def update_user(self, user_update: UserUpdate) -> UserResponse:
         with self.uow:
             # Retrieve the existing user
             user = self.uow.users.get_by(id=user_update.id)
@@ -61,7 +61,7 @@ class UserService:
 
             updated_user = self.uow.users.update(user)
 
-            return UserOut.model_validate(updated_user)
+            return UserResponse.model_validate(updated_user)
 
     def login(self, email: str, password: str) -> LoginResponse:
         user = self.uow.users.get_by(email=email)

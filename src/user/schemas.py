@@ -34,7 +34,7 @@ class UserCreate(UserBase):
     password: Annotated[str, Field(..., min_length=8, max_length=128)]
 
 
-class UserOut(UserBase):
+class UserResponse(UserBase):
     """
     Represents the output model for user information.
 

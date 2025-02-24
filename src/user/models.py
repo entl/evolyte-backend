@@ -9,8 +9,8 @@ from src.core.db.session import Base
 
 
 class Roles(enum.Enum):
-    ADMIN = "admin"
-    USER = "user"
+    ADMIN = "ADMIN"
+    USER = "USER"
 
 
 class User(Base):

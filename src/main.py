@@ -11,6 +11,7 @@ from src.health.routers import health_router
 from src.user.routers import users_router
 from src.auth.routers import auth_router
 from src.solar_panels.routers import solar_panels_router
+from src.pvgis.routers import pvgis_router
 
 # index models
 from src.solar_panels.models import SolarPanel
@@ -68,6 +69,7 @@ def init_routers(app_: FastAPI) -> None:
     prefix_router.include_router(users_router)
     prefix_router.include_router(auth_router)
     prefix_router.include_router(solar_panels_router)
+    prefix_router.include_router(pvgis_router)
 
     app_.include_router(prefix_router)
 

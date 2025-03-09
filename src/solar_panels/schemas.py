@@ -50,3 +50,17 @@ class SolarPanelResponse(SolarPanelBase):
 
     class Config:
         from_attributes = True
+
+
+class SolarPanelsCluster(BaseModel):
+    latitude: float
+    longitude: float
+    count: int
+    min_longitude: float
+    max_longitude: float
+    min_latitude: float
+    max_latitude: float
+
+
+class ClusteredSolarPanelsResponse(BaseModel):
+    clusters: list[SolarPanelsCluster]

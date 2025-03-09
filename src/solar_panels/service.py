@@ -3,7 +3,8 @@ from geoalchemy2.shape import to_shape
 from src.core.db.uow import UnitOfWork
 from src.core.exceptions.solar_panels import SolarPanelNotFoundException
 from src.solar_panels.models import SolarPanel
-from src.solar_panels.schemas import SolarPanelCreate, SolarPanelUpdate, SolarPanelResponse, PanelStatusEnum
+from src.solar_panels.schemas import SolarPanelCreate, SolarPanelUpdate, SolarPanelResponse, PanelStatusEnum, \
+    SolarPanelsCluster, ClusteredSolarPanelsResponse
 
 
 class SolarPanelService:
@@ -27,7 +28,8 @@ class SolarPanelService:
         panels = self.uow.solar_panels.get_by(status=status)
         return [SolarPanelResponse.model_validate(panel) for panel in panels]
 
-    def get_solar_panels_based_on_zoom(self, min_lat: float, max_lat: float, min_lon: float, max_lon: float, zoom_level: int):
+    def get_solar_panels_based_on_zoom(self, min_lat: float, max_lat: float, min_lon: float, max_lon: float,
+                                       zoom_level: int):
         if zoom_level > 12:
             return self.uow.solar_panels.get_panels_in_bounds(min_lat, max_lat, min_lon, max_lon)
 
@@ -38,19 +40,24 @@ class SolarPanelService:
         panels = self.uow.solar_panels.get_nearby_panels(lat, lon, radius)
         return [SolarPanelResponse.model_validate(panel) for panel in panels]
 
-    def get_clustered_panels(self, min_lat: float, max_lat: float, min_lon: float, max_lon: float, zoom_level: int) -> list[SolarPanelResponse]:
-        panels = self.uow.solar_panels.get_clustered_panels(min_lat, max_lat, min_lon, max_lon, zoom_level)
-        return [SolarPanelResponse.model_validate(panel) for panel in panels]
+    def get_clustered_panels(self, min_lat: float, max_lat: float, min_lon: float, max_lon: float,
+                             zoom_level: int) -> ClusteredSolarPanelsResponse:
+        eps, min_points = self.get_eps_min_points(zoom_level)
+        clusters = self.uow.solar_panels.get_clustered_panels(min_lat, max_lat, min_lon, max_lon, eps=eps, min_points=10)
+        cluster_models = [self._solar_panels_cluster_tuple_to_model(cluster) for cluster in clusters]
 
-    def get_solar_panel_in_bounds(self, min_lat: float, max_lat: float, min_lon: float, max_lon: float) -> list[SolarPanelResponse]:
+        return ClusteredSolarPanelsResponse(clusters=cluster_models)
+
+    def get_solar_panel_in_bounds(self, min_lat: float, max_lat: float, min_lon: float, max_lon: float) -> list[
+        SolarPanelResponse]:
         panels = self.uow.solar_panels.get_panels_in_bounds(min_lat, max_lat, min_lon, max_lon)
+        for panel in panels:
+            panel.location = self.__wkbelement_to_lat_lon(panel.location)
         return [SolarPanelResponse.model_validate(panel) for panel in panels]
 
     def create_solar_panel(self, solar_panel_data: SolarPanelCreate) -> SolarPanelResponse:
-        print(solar_panel_data)
         with self.uow as uow:
             solar_panel = SolarPanel(**solar_panel_data.dict())
-            print(solar_panel)
 
             created_solar_panel = uow.solar_panels.create(solar_panel)
             uow.flush()  # ensure the ID and location
@@ -64,8 +71,6 @@ class SolarPanelService:
 
     def create_bulk_solar_panels(self, solar_panels: list[SolarPanelCreate]) -> list[SolarPanelResponse]:
         with self.uow:
-            print("Hui")
-            print(solar_panels[0])
             solar_panels = [SolarPanel(**panel.model_dump()) for panel in solar_panels]
             created_solar_panels = []
 
@@ -105,3 +110,33 @@ class SolarPanelService:
         # convert postgis POINT to lat, lon
         point = to_shape(wkbelement)
         return (point.x, point.y)
+
+    def _solar_panels_cluster_tuple_to_model(self, cluster_tuple) -> SolarPanelsCluster:
+        return SolarPanelsCluster(count=cluster_tuple[0], longitude=cluster_tuple[1], latitude=cluster_tuple[2],
+                                  min_longitude=cluster_tuple[3], max_longitude=cluster_tuple[4],
+                                  min_latitude=cluster_tuple[5], max_latitude=cluster_tuple[6])
+
+    def get_eps_min_points(self, zoom_level: int) -> tuple[float, int]:
+        if zoom_level < 4:
+            eps = 1.2  # ~155 km (was 1.5)
+            min_points = 50  # Large clusters
+        elif 4 <= zoom_level < 6:
+            eps = 0.6  # ~77 km (was 0.8)
+            min_points = 30
+        elif 6 <= zoom_level < 8:
+            eps = 0.22  # ~24 km (was 0.3) - 27% smaller
+            min_points = 20
+        elif 8 <= zoom_level < 10:
+            eps = 0.075  # ~8.3 km (was 0.1) - 25% smaller
+            min_points = 3
+        elif 10 <= zoom_level < 12:
+            eps = 0.035  # ~3.85 km (was 0.05) - 30% smaller
+            min_points = 3
+        elif 12 <= zoom_level < 14:
+            eps = 0.008  # ~880 meters (was 0.01) - 20% smaller
+            min_points = 2
+        else:
+            eps = 0.004  # ~440 meters (was 0.005) - 20% smaller
+            min_points = 2  # Almost no clustering
+
+        return eps, min_points

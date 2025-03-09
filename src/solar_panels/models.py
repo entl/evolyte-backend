@@ -16,6 +16,45 @@ class PanelStatus(enum.Enum):
     UNKNOWN = "UNKNOWN"
 
 
+class SolarPanelHourlyRecord(Base):
+    __tablename__ = 'solar_panel_hourly_records'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    solar_panel_id = Column(Integer, ForeignKey('solar_panels.id'), nullable=False)
+    timestamp = Column(DateTime, nullable=False)
+
+    # Power Production Data
+    power_output_kw = Column(Float, nullable=False)  # instant kw
+    energy_generated_kwh = Column(Float, nullable=False)  # cumulative kwh
+    predicted_power_output_kw = Column(Float, nullable=True)  # predicted kwh
+
+    # Performance Metrics
+    efficiency_percent = Column(Float, nullable=True)  # Actual efficiency
+
+    # Environmental Conditions
+    cell_temperature_celsius = Column(Float, nullable=True)  # cell temperature
+    temperature_celsius = Column(Float, nullable=True)  # Ambient temperature
+    irradiance = Column(Float, nullable=True)  # Solar irradiance
+    poa_irradiance = Column(Float, nullable=True)  # Plane of array irradiance
+    cloud_cover_percent = Column(Float, nullable=True)
+    wind_speed_kmh = Column(Float, nullable=True)
+    wind_direction_degrees = Column(Float, nullable=True)
+    humidity_percent = Column(Float, nullable=True)
+    precipitation_mm = Column(Float, nullable=True)
+    pressure_msl_hpa = Column(Float, nullable=True)
+    clear_sky_index = Column(Float, nullable=True)
+
+    # Metadata
+    created_at = Column(DateTime, default=func.now())
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+
+    # Relationships
+    solar_panel = relationship("SolarPanel", back_populates="hourly_records")
+
+    def __repr__(self):
+        return f"<SolarPanelHourlyRecord(id={self.id}, panel_id={self.solar_panel_id}, timestamp={self.timestamp}, power_output={self.power_output_kw}kW)>"
+
+
 class SolarPanel(Base):
     __tablename__ = 'solar_panels'
 
@@ -47,6 +86,8 @@ class SolarPanel(Base):
 
     user_id = Column(Integer, ForeignKey('users.id'), nullable=True)
     user = relationship("User", back_populates="solar_panels")
+
+    hourly_records = relationship("SolarPanelHourlyRecord", back_populates="solar_panel")
 
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())

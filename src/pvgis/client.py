@@ -1,5 +1,4 @@
 import requests
-from typing import Any
 
 
 class PVGISAPIClient:
@@ -16,14 +15,14 @@ class PVGISAPIClient:
         :return: API response (parsed JSON or raw data).
         """
         url = f"{PVGISAPIClient.BASE_URL}/{tool}"
-        params["outputformat"] = output_format  # Ensure output format is included
+        params["outputformat"] = output_format
         try:
             response = requests.get(url, params=params)
-            response.raise_for_status()  # Raise an error for bad responses (4xx, 5xx)
+            response.raise_for_status()
 
             if output_format == "json":
-                return response.json()  # Parse and return JSON response
-            return response.text  # Return raw data for other formats
+                return response.json()
+            return response.text
 
         except requests.exceptions.RequestException as e:
             return {**response.json(), "error": str(e)}

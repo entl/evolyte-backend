@@ -12,10 +12,16 @@ from src.user.routers import users_router
 from src.auth.routers import auth_router
 from src.solar_panels.routers import solar_panels_router
 from src.pvgis.routers import pvgis_router
+from src.predict.routers import predict_router
+from src.weather.routers import weather_router
 
 # index models
 from src.solar_panels.models import SolarPanel
 from src.user.models import User
+
+# disable warning
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
 # web domain which can access api
 origins = [
@@ -70,6 +76,8 @@ def init_routers(app_: FastAPI) -> None:
     prefix_router.include_router(auth_router)
     prefix_router.include_router(solar_panels_router)
     prefix_router.include_router(pvgis_router)
+    prefix_router.include_router(predict_router)
+    prefix_router.include_router(weather_router)
 
     app_.include_router(prefix_router)
 

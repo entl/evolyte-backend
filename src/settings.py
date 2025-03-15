@@ -12,6 +12,8 @@ class Settings(BaseSettings):
     jwt_algorithm: str
     jwt_token_expire_minutes: int
 
+    ml_api_url: str
+
     class Config:
         env_file = ".env"
 

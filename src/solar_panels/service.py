@@ -13,12 +13,18 @@ class SolarPanelService:
 
     def get_all_solar_panels(self) -> list[SolarPanelResponse]:
         panels = self.uow.solar_panels.get_all()
+        for panel in panels:
+            panel.location = self.__wkbelement_to_lat_lon(panel.location)
         return [SolarPanelResponse.model_validate(panel) for panel in panels]
 
-    def get_solar_panel_by_id(self, solar_panel_id: int) -> SolarPanelResponse:
+    def get_solar_panel_by_id(self, solar_panel_id: int) -> SolarPanelResponse :
         panel = self.uow.solar_panels.get_by(id=solar_panel_id)
-        panel.location = self.__wkbelement_to_lat_lon(panel.location)
-        return SolarPanelResponse.model_validate(panel) if panel else None
+        
+        if panel:
+            panel.location = self.__wkbelement_to_lat_lon(panel.location)
+            return SolarPanelResponse.model_validate(panel)
+        
+        raise SolarPanelNotFoundException()  # Raise exception if not found
 
     def get_solar_panels_by_user_id(self, user_id: int) -> list[SolarPanelResponse]:
         panels = self.uow.solar_panels.get_by(user_id=user_id)

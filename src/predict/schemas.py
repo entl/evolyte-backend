@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, field_validator, ValidationInfo
+from pydantic import BaseModel, Field, model_validator, ValidationInfo
 from typing import List, Optional, Annotated
 
 from datetime import datetime, timedelta
@@ -38,28 +38,27 @@ class TimeSeriesPredictionRequest(BaseModel):
     tilt: Optional[float] = Field(None, example=30.0, description="Tilt angle in degrees")
     azimuth: Optional[float] = Field(None, example=180.0, description="Azimuth angle in degrees")
     kwh_price: Optional[float] = Field(None, example=0.15, description="Price per kWh in selected currency")
+    
+    @model_validator(mode="after")
+    def check_date_constraints(cls, m):
+        # ensure end >= start
+        if m.end < m.start:
+            raise ValueError("`end` must be the same or after `start`")
 
-    @field_validator("end", mode="after")
-    @classmethod
-    def validate_date_range(cls, value: datetime, info: ValidationInfo):
-        start = info.data["start"]
-        if (value - start).days > 30:
+        span = m.end - m.start
+
+        # no more than 30 days
+        if span > timedelta(days=30):
             raise ValueError("Date range must be within 30 days")
 
-        return value
+        # date cant be more than 16 days in advance
+        max_ahead = datetime.now() + timedelta(days=16)
+        if m.start > max_ahead or m.end > max_ahead:
+            raise ValueError("Forecast dates must not be more than 16 days in advance")
 
-    @field_validator("start", "end", mode="after")
-    @classmethod
-    def dates_must_be_within_16_days(cls, value: datetime):
-        max_allowed_date = datetime.now() + timedelta(days=16)
-
-        if value > max_allowed_date:
-            raise ValueError("Forecast dates must not be more than 16 days in advance.")
-
-        return value
+        return m
 
 
-# Define the expected features as a dedicated model.
 class FeatureInput(BaseModel):
     kwp: float = Field(..., example=5.0, description="Installed capacity in kW")
     relative_humidity_2m: float = Field(..., example=65.3, description="%")

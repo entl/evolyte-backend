@@ -15,6 +15,8 @@ from src.pvgis.routers import pvgis_router
 from src.predict.routers import predict_router
 from src.weather.routers import weather_router
 
+from src.settings import settings
+
 # index models
 from src.solar_panels.models import SolarPanel
 from src.user.models import User
@@ -22,11 +24,6 @@ from src.user.models import User
 # disable warning
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
-
-# web domain which can access api
-origins = [
-    "*",
-]
 
 
 def on_auth_error(request: Request, exc: Exception):
@@ -46,7 +43,7 @@ def make_middleware() -> List[Middleware]:
     middleware = [
         Middleware(
             CORSMiddleware,
-            allow_origins=["*"],
+            allow_origins=settings.cors_origins,
             allow_credentials=True,
             allow_methods=["*"],
             allow_headers=["*"],
@@ -84,13 +81,7 @@ def init_routers(app_: FastAPI) -> None:
 
 def create_app():
     app_ = FastAPI(middleware=make_middleware())
-    app_.add_middleware(
-        CORSMiddleware,
-        allow_origins=origins,
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+
     init_listeners(app_=app_)
     init_routers(app_=app_)
 

@@ -14,6 +14,8 @@ class Settings(BaseSettings):
 
     ml_api_url: str
 
+    cors_origins: list[str]
+
     class Config:
         env_file = ".env"
 

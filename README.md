@@ -8,8 +8,8 @@ This project provides the main backend services for a solar energy forecasting p
 ### 1. Clone the repository
 
 ```bash
-git clone https://your-repo-url.git
-cd your-repo-folder
+git clone https://github.com/entl/evolyte-backend
+cd evolyte-backend
 ```
 
 ### 2. Create a virtual environment and activate it

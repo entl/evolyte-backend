@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 
 import pytest
 
@@ -85,8 +85,8 @@ def test_create_user_raises_exception_on_duplicate_email(mock_uow):
         username="test",
         email="test@example.com",
         password="hashedpass123",
-        created_at=datetime.datetime.now(),
-        updated_at=datetime.datetime.now()
+        created_at=datetime.now(),
+        updated_at=datetime.now()
     )
 
     mock_uow.users.get_by.side_effect = [test]
@@ -95,8 +95,8 @@ def test_create_user_raises_exception_on_duplicate_email(mock_uow):
                       email="test@example.com", 
                       password="12345678",
                       full_name='test user',
-                      created_at=datetime.datetime.now(),
-                      updated_at=datetime.datetime.now()
+                      created_at=datetime.now(),
+                      updated_at=datetime.now()
                       )
 
     with pytest.raises(DuplicateEmailOrUsernameException):
@@ -115,8 +115,8 @@ def test_create_user_raises_success(mock_uow):
         email="test@example.com",
         password="hashedpass123",
         full_name='test user',
-        created_at=datetime.datetime.now(),
-        updated_at=datetime.datetime.now()
+        created_at=datetime.now(),
+        updated_at=datetime.now()
     )
     mock_uow.users.create.return_value = test_user
     
@@ -125,8 +125,8 @@ def test_create_user_raises_success(mock_uow):
         email="test@example.com",
         password="12345678",
         full_name='test user',
-        created_at=datetime.datetime.now(),
-        updated_at=datetime.datetime.now()
+        created_at=datetime.now(),
+        updated_at=datetime.now()
     )
 
     result = service.create_user(user_create)
@@ -147,8 +147,8 @@ def test_update_user_success(mock_uow):
         email="old@example.com",
         password="oldpass123",
         full_name="Old Name",
-        created_at=datetime.datetime.now(),
-        updated_at=datetime.datetime.now()
+        created_at=datetime.now(),
+        updated_at=datetime.now()
     )
     
     # Mock get existing user
@@ -164,7 +164,7 @@ def test_update_user_success(mock_uow):
         password="oldpass123",
         full_name="New Name",
         created_at=test_user.created_at,
-        updated_at=datetime.datetime.now()
+        updated_at=datetime.now()
     )
     mock_uow.users.update.return_value = updated_user
     

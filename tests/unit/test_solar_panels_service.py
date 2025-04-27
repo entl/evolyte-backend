@@ -4,6 +4,7 @@ import pytest
 from geoalchemy2.shape import from_shape
 from shapely.geometry import Point
 
+from src.core.exceptions.solar_panels import SolarPanelNotFoundException
 from src.solar_panels.service import SolarPanelService
 from src.solar_panels.schemas import SolarPanelCreate
 from src.solar_panels.models import SolarPanel, PanelStatus
@@ -84,8 +85,9 @@ def test_get_solar_panel_by_id_success(solar_panels_service, sample_solar_panels
     
 def test_get_solar_panel_by_id_not_found(solar_panels_service, mock_uow):
     mock_uow.solar_panels.get_by.return_value = None
-    solar_panel = solar_panels_service.get_solar_panel_by_id(1)
-    assert solar_panel is None
+
+    with pytest.raises(SolarPanelNotFoundException):
+        solar_panels_service.get_solar_panel_by_id(1)
     
     
 def test_create_solar_panel_success(solar_panels_service, mock_uow):

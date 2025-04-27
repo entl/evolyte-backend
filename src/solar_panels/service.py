@@ -63,7 +63,7 @@ class SolarPanelService:
 
     def create_solar_panel(self, solar_panel_data: SolarPanelCreate) -> SolarPanelResponse:
         with self.uow as uow:
-            solar_panel = SolarPanel(**solar_panel_data.dict())
+            solar_panel = SolarPanel(**solar_panel_data.model_dump())
 
             created_solar_panel = uow.solar_panels.create(solar_panel)
             uow.flush()  # ensure the ID and location

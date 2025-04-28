@@ -8,8 +8,8 @@ This project provides the main backend services for a solar energy forecasting p
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/entl/evolyte-backend
-cd evolyte-backend
+git clone https://github.com/entl/evolyte-ml-backend
+cd evolyte-ml-backend
 ```
 
 ### 2. Create a virtual environment and activate it
@@ -24,10 +24,8 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```bash
 pip install -r requirements.txt
 ```
-
-### 4. Create a `.env` file
-
-Create a `.env` file in the project root directory and add the following environment variables:
+### 4. Create a .env file
+Create a .env file in the project root directory and add the following environment variables:
 
 ```env
 PG_DATABASE_HOSTNAME
@@ -49,18 +47,43 @@ CORS_ORIGINS= (list format)
 - Update `PG_DATABASE_PASSWORD`, `PG_DATABASE_NAME`, and other variables if needed.
 - Make sure your PostgreSQL server is running.
 
-### 5. Run the FastAPI application
+### 5. Apply database migrations
+
+Run Alembic migrations to upgrade the database schema:
+
+```bash
+alembic upgrade head
+```
+
+### 6. Populate the database
+
+After running the migrations, populate the `solar_panels` table by importing the provided CSV file into your PostgreSQL database.
+
+The `solar_panels.csv` file is located in the project root directory.
+
+Example command using `psql`:
+
+```bash
+psql -h <HOST> -U <USERNAME> -d <DATABASE> -c "\COPY solar_panels(column1, column2, ...) FROM './solar_panels.csv' DELIMITER ',' CSV HEADER;"
+```
+
+- Replace `<HOST>`, `<USERNAME>`, and `<DATABASE>` with your database details.
+- Make sure the columns match your database schema.
+
+Alternatively, you can use your preferred PostgreSQL client (like DBeaver, pgAdmin, etc.) to import the file.
+
+### 7. Run the FastAPI ML service
 
 ```bash
 uvicorn src.main:app --reload --port=8001
 ```
 
-### 6. Access the API documentation
+### 8. Access the API documentation
 
-Once the server is running locally:
+Once the server is running:
 
-- Open **Swagger UI** (Interactive API docs):  
-  [http://localhost:8000/docs](http://localhost:8000/docs)
+- Open **Swagger UI** (interactive API docs):  
+  [http://localhost:8001/docs](http://localhost:8001/docs)
 
 - Open **ReDoc** documentation (alternative style):  
-  [http://localhost:8000/redoc](http://localhost:8000/redoc)
+  [http://localhost:8001/redoc](http://localhost:8001/redoc)

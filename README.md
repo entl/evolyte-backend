@@ -5,7 +5,7 @@ This project provides the main backend services for a solar energy forecasting p
 
 > **Note:**  
 > This repository is actively being developed as part of my personal learning.  
-> For the version submitted for the final university project, please refer to commit [`514c445`](https://github.com/entl/evolyte-ml-backend/commit/514c445).
+> For the version submitted for the final university project, please refer to commit [`514c445`](https://github.com/entl/evolyte-backend/tree/514c445be265d1cb040a724db322553006c8ff1b).
 
 
 ## Setup Instructions

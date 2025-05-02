@@ -78,7 +78,8 @@ target/
 celerybeat-schedule
 
 # dotenv
-.env
+.env.prod
+.env*
 
 # virtualenv
 venv/

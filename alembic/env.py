@@ -8,8 +8,7 @@ from alembic import context
 from src.settings import settings
 
 from src.core.db.session import Base
-from src import models
-from src.user import models
+from src.main import  SolarPanel, User
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     cors_origins: list[str]
 
     class Config:
-        env_file = ".env"
+        env_file = ".env.dev"
 
 
 settings = Settings()

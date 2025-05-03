@@ -13,6 +13,19 @@ jobs:
       - run: ruff check
 
   test:
+    environment:
+      name: testing
+    env:
+      PG_DATABASE_HOSTNAME: ${{secrets.PG_DATABASE_HOSTNAME}}
+      PG_DATABASE_PORT: ${{secrets.PG_DATABASE_PORT}}
+      PG_DATABASE_PASSWORD: ${{secrets.PG_DATABASE_PASSWORD}}
+      PG_DATABASE_NAME: ${{secrets.PG_DATABASE_NAME}}
+      PG_DATABASE_USERNAME: ${{secrets.PG_DATABASE_USERNAME}}
+      JWT_SECRET_KEY: ${{secrets.JWT_SECRET_KEY}}
+      JWT_ALGORITHM: ${{secrets.JWT_ALGORITHM}}
+      jwt_token_expire_minutes: ${{secrets.jwt_token_expire_minutes}}
+      ML_API_URL: ${{secrets.ML_API_URL}}
+      CORS_ORIGINS: ${{secrets.CORS_ORIGINS}}
     runs-on: ubuntu-latest
     needs: lint
     steps:

@@ -96,9 +96,9 @@ class SolarPanel(Base):
             manufacturer="{self.manufacturer}", model="{self.model}", installation_date="{self.installation_date.isoformat() if self.installation_date else None}",
             capacity_kw={self.capacity_kw}, efficiency={self.efficiency}, voltage_rating={self.voltage_rating},
             current_rating={self.current_rating}, width={self.width}, length={self.length}, height={self.height},
-            weight={self.weight}, orientation={self.orientation}, tilt={self.tilt}, 
-            status="{self.status.name}", 
-            location="{self.location}", 
-            user_id={self.user_id}, created_at="{self.created_at.isoformat() if self.created_at else None}", 
+            weight={self.weight}, orientation={self.orientation}, tilt={self.tilt},
+            status="{self.status.name}",
+            location="{self.location}",
+            user_id={self.user_id}, created_at="{self.created_at.isoformat() if self.created_at else None}",
             updated_at="{self.updated_at.isoformat() if self.updated_at else None}"
         )>"""

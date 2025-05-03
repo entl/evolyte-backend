@@ -132,7 +132,7 @@ def test_time_series_prediction_request_range_exceeds_30_days():
 
 def test_time_series_prediction_request_dates_too_far_ahead():
     now = datetime.utcnow()
-    
+
     # start after  16 days
     start = now + timedelta(days=17)
     end = start + timedelta(days=1)
@@ -146,7 +146,9 @@ def test_time_series_prediction_request_dates_too_far_ahead():
     with pytest.raises(ValidationError) as exc:
         TimeSeriesPredictionRequest(**payload)
     messages = [e["msg"] for e in exc.value.errors()]
-    assert any("Forecast dates must not be more than 16 days in advance" in m for m in messages)
+    assert any(
+        "Forecast dates must not be more than 16 days in advance" in m for m in messages
+    )
 
 
 def test_feature_input_valid_and_missing_fields():

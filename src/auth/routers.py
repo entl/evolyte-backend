@@ -28,7 +28,14 @@ def verify_token(request: VerifyTokenRequest):
     JwtService().verify_token(token=request.token)
 
 
-@auth_router.post("/login", response_model=LoginResponse, status_code=status.HTTP_200_OK)
-def login(user_credentials: Annotated[OAuth2PasswordRequestForm, Depends()], user_service: UserServiceDep):
-    token = user_service.login(email=user_credentials.username, password=user_credentials.password)
+@auth_router.post(
+    "/login", response_model=LoginResponse, status_code=status.HTTP_200_OK
+)
+def login(
+    user_credentials: Annotated[OAuth2PasswordRequestForm, Depends()],
+    user_service: UserServiceDep,
+):
+    token = user_service.login(
+        email=user_credentials.username, password=user_credentials.password
+    )
     return token

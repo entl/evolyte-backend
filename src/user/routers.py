@@ -7,7 +7,12 @@ from src.user.schemas import UserCreate, UserResponse, UserUpdate
 from src.user.service import UserService
 
 from src.core.exceptions.user import InsufficientPermissions, UserNotFoundException
-from src.core.dependencies.permission import PermissionDependencyHTTP, IsAuthenticated, IsAdmin, Permissions
+from src.core.dependencies.permission import (
+    PermissionDependencyHTTP,
+    IsAuthenticated,
+    IsAdmin,
+    Permissions,
+)
 from src.core.dependencies.user import UserServiceDep
 from src.schemas import CurrentUser
 
@@ -18,7 +23,7 @@ users_router = APIRouter(prefix="/users", tags=["Users"])
     "/",
     response_model=list[UserResponse],
     status_code=status.HTTP_200_OK,
-    dependencies=[Depends(PermissionDependencyHTTP([IsAuthenticated]))]
+    dependencies=[Depends(PermissionDependencyHTTP([IsAuthenticated]))],
 )
 def get_all_users(user_service: UserServiceDep):
     """
@@ -40,7 +45,7 @@ def get_all_users(user_service: UserServiceDep):
     "/{user_id}",
     response_model=UserResponse,
     status_code=status.HTTP_200_OK,
-    dependencies=[Depends(PermissionDependencyHTTP([IsAuthenticated]))]
+    dependencies=[Depends(PermissionDependencyHTTP([IsAuthenticated]))],
 )
 def get_user_by_id(user_id: int, user_service: UserServiceDep):
     """
@@ -87,11 +92,11 @@ def create_user(user_service: UserServiceDep, user: UserCreate):
     status_code=status.HTTP_200_OK,
 )
 def update_user(
-        user_service: UserServiceDep,
-        updated_user: UserUpdate,
-        current_user: Annotated[CurrentUser, Depends(
-            PermissionDependencyHTTP([IsAuthenticated, IsAdmin])
-        )]
+    user_service: UserServiceDep,
+    updated_user: UserUpdate,
+    current_user: Annotated[
+        CurrentUser, Depends(PermissionDependencyHTTP([IsAuthenticated, IsAdmin]))
+    ],
 ):
     """
     Update a user.
@@ -104,23 +109,24 @@ def update_user(
     Returns:
         UserResponse: Updated user data.
     """
-    if current_user.id == updated_user.id or Permissions.IsAdmin in current_user.permissions:
+    if (
+        current_user.id == updated_user.id
+        or Permissions.IsAdmin in current_user.permissions
+    ):
         return user_service.update_user(updated_user)
     else:
         raise InsufficientPermissions()
 
 
 @users_router.delete(
-    "/{user_id}",
-    status_code=status.HTTP_204_NO_CONTENT,
-    dependencies=[]
+    "/{user_id}", status_code=status.HTTP_204_NO_CONTENT, dependencies=[]
 )
 def delete_user(
-        user_service: UserServiceDep,
-        user_id: UUID4,
-        current_user: Annotated[CurrentUser, Depends(
-            PermissionDependencyHTTP([IsAuthenticated, IsAdmin])
-        )]
+    user_service: UserServiceDep,
+    user_id: UUID4,
+    current_user: Annotated[
+        CurrentUser, Depends(PermissionDependencyHTTP([IsAuthenticated, IsAdmin]))
+    ],
 ):
     """
     Delete a user.

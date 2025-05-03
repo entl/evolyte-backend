@@ -11,4 +11,3 @@ def pvgis_service():
 
 
 PVGISServiceDep = Annotated[PVGISService, Depends(pvgis_service)]
-

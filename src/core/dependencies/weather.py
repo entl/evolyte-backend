@@ -18,5 +18,3 @@ def weather_service(weather_client: WeatherClientDep):
 
 
 WeatherServiceDep = Annotated[WeatherService, Depends(weather_service)]
-
-

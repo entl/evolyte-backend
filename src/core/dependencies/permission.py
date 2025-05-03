@@ -51,7 +51,7 @@ class PermissionDependencyBase(SecurityBase, ABC):
     @abstractmethod
     def __call__(self, request: Request) -> CurrentUser:
         pass
-    
+
     @abstractmethod
     def is_user_has_any_permissions(self, request: Request) -> List[str]:
         pass

@@ -7,6 +7,7 @@ from src.user.models import User
 from src.user.schemas import UserCreate, UserUpdate
 from src.user.service import UserService
 
+
 @pytest.fixture
 def sample_users():
     now = datetime.utcnow()
@@ -19,7 +20,7 @@ def sample_users():
             role="user",
             full_name="John Doe",
             created_at=now,
-            updated_at=now
+            updated_at=now,
         ),
         User(
             id=2,
@@ -29,15 +30,13 @@ def sample_users():
             role="admin",
             full_name="Admin User",
             created_at=now,
-            updated_at=now
+            updated_at=now,
         ),
     ]
 
 
 def test_get_all_users_returns_all_users(mock_uow, sample_users):
-    mock_uow.users.get_all.return_value = [
-        *sample_users
-    ]
+    mock_uow.users.get_all.return_value = [*sample_users]
     service = UserService(mock_uow)
 
     result = service.get_all_users()
@@ -86,18 +85,19 @@ def test_create_user_raises_exception_on_duplicate_email(mock_uow):
         email="test@example.com",
         password="hashedpass123",
         created_at=datetime.now(),
-        updated_at=datetime.now()
+        updated_at=datetime.now(),
     )
 
     mock_uow.users.get_by.side_effect = [test]
 
-    user = UserCreate(username="test", 
-                      email="test@example.com", 
-                      password="12345678",
-                      full_name='test user',
-                      created_at=datetime.now(),
-                      updated_at=datetime.now()
-                      )
+    user = UserCreate(
+        username="test",
+        email="test@example.com",
+        password="12345678",
+        full_name="test user",
+        created_at=datetime.now(),
+        updated_at=datetime.now(),
+    )
 
     with pytest.raises(DuplicateEmailOrUsernameException):
         service.create_user(user)
@@ -105,42 +105,42 @@ def test_create_user_raises_exception_on_duplicate_email(mock_uow):
 
 def test_create_user_raises_success(mock_uow):
     service = UserService(mock_uow)
-    
+
     # mock that no existing user is found with same email oe username
     mock_uow.users.get_by.side_effect = None
-    
+
     test_user = User(
         id=3,
         username="test",
         email="test@example.com",
         password="hashedpass123",
-        full_name='test user',
+        full_name="test user",
         created_at=datetime.now(),
-        updated_at=datetime.now()
+        updated_at=datetime.now(),
     )
     mock_uow.users.create.return_value = test_user
-    
+
     user_create = UserCreate(
         username="test",
         email="test@example.com",
         password="12345678",
-        full_name='test user',
+        full_name="test user",
         created_at=datetime.now(),
-        updated_at=datetime.now()
+        updated_at=datetime.now(),
     )
 
     result = service.create_user(user_create)
-    
+
     assert result is not None
     assert result.username == "test"
     assert result.email == "test@example.com"
-    
+
     mock_uow.users.create.assert_called_once()
 
 
 def test_update_user_success(mock_uow):
     service = UserService(mock_uow)
-    
+
     test_user = User(
         id=1,
         username="oldname",
@@ -148,14 +148,16 @@ def test_update_user_success(mock_uow):
         password="oldpass123",
         full_name="Old Name",
         created_at=datetime.now(),
-        updated_at=datetime.now()
+        updated_at=datetime.now(),
     )
-    
+
     # Mock get existing user
     mock_uow.users.get_by.return_value = test_user
-    
-    new_data = UserUpdate(id=1, username="newname", email="newname@test.com", full_name="New Name")
-    
+
+    new_data = UserUpdate(
+        id=1, username="newname", email="newname@test.com", full_name="New Name"
+    )
+
     # Mock update
     updated_user = User(
         id=1,
@@ -164,17 +166,17 @@ def test_update_user_success(mock_uow):
         password="oldpass123",
         full_name="New Name",
         created_at=test_user.created_at,
-        updated_at=datetime.now()
+        updated_at=datetime.now(),
     )
     mock_uow.users.update.return_value = updated_user
-    
+
     result = service.update_user(new_data)
-    
+
     assert result is not None
     assert result.id == 1
     assert result.username == "newname"
     assert result.email == "new@example.com"
     assert result.full_name == "New Name"
-    
+
     mock_uow.users.get_by.assert_called_once_with(id=1)
     mock_uow.users.update.assert_called_once()

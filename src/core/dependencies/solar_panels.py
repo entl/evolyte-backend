@@ -12,7 +12,9 @@ def solar_panel_repository():
     return SolarPanelRepository(SessionFactory())
 
 
-SolarPanelRepositoryDep = Annotated[SolarPanelRepository, Depends(solar_panel_repository)]
+SolarPanelRepositoryDep = Annotated[
+    SolarPanelRepository, Depends(solar_panel_repository)
+]
 
 
 def solar_panel_service(uow: UowDep):

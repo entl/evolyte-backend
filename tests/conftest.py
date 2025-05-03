@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock, PropertyMock
 import pytest
 
+
 @pytest.fixture(scope="function")
 def mock_uow(mock_user_repository, mock_solar_panel_repository):
     uow = MagicMock()
@@ -39,5 +40,3 @@ def mock_solar_panel_repository():
     mock_solar_panel_repository.get_nearby_panels.return_value = []
 
     return mock_solar_panel_repository
-
-

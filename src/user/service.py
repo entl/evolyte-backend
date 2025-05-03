@@ -2,7 +2,10 @@ from typing import Optional, List
 from .schemas import UserResponse, UserCreate, UserUpdate, LoginResponse
 from .models import User
 
-from src.core.exceptions.user import UserNotFoundException, PasswordDoesNotMatchException
+from src.core.exceptions.user import (
+    UserNotFoundException,
+    PasswordDoesNotMatchException,
+)
 from src.core.exceptions.user import DuplicateEmailOrUsernameException
 
 from src.core.utils import password_helper
@@ -73,7 +76,7 @@ class UserService:
         return LoginResponse(
             access_token=TokenHelper.encode(payload={"user_id": str(user.id)}),
             refresh_token=TokenHelper.encode(payload={"sub": "refresh"}),
-            token_type="bearer"
+            token_type="bearer",
         )
 
     def is_admin(self, user_id: int) -> bool:

@@ -1,6 +1,14 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import func, select
-from geoalchemy2.functions import ST_X, ST_Y, ST_Within, ST_MakeEnvelope, ST_DWithin, ST_GeomFromText, ST_ClusterDBSCAN
+from geoalchemy2.functions import (
+    ST_X,
+    ST_Y,
+    ST_Within,
+    ST_MakeEnvelope,
+    ST_DWithin,
+    ST_GeomFromText,
+    ST_ClusterDBSCAN,
+)
 
 from src.solar_panels.models import SolarPanel
 from src.repository import BaseRepository, T
@@ -18,16 +26,21 @@ class SolarPanelRepository(BaseRepository[SolarPanel]):
 
         return super().create(obj_data)
 
-    def get_clustered_panels(self, min_lat, max_lat, min_lon, max_lon, eps: float = 0.1, min_points: int = 50):
+    def get_clustered_panels(
+        self, min_lat, max_lat, min_lon, max_lon, eps: float = 0.1, min_points: int = 50
+    ):
         clustered_panels = (
             select(
-                ST_ClusterDBSCAN(SolarPanel.location, eps, min_points).over().label("cluster_id"),
+                ST_ClusterDBSCAN(SolarPanel.location, eps, min_points)
+                .over()
+                .label("cluster_id"),
                 SolarPanel.id.label("panel_id"),
                 ST_X(SolarPanel.location).label("lon"),
-                ST_Y(SolarPanel.location).label("lat")
-            )
-            .where(
-                SolarPanel.location.op("&&")(ST_MakeEnvelope(min_lon, min_lat, max_lon, max_lat, 4326))
+                ST_Y(SolarPanel.location).label("lat"),
+            ).where(
+                SolarPanel.location.op("&&")(
+                    ST_MakeEnvelope(min_lon, min_lat, max_lon, max_lat, 4326)
+                )
             )
         ).subquery()
 
@@ -54,7 +67,7 @@ class SolarPanelRepository(BaseRepository[SolarPanel]):
             .filter(
                 ST_Within(
                     SolarPanel.location,
-                    ST_MakeEnvelope(min_lon, min_lat, max_lon, max_lat, 4326)
+                    ST_MakeEnvelope(min_lon, min_lat, max_lon, max_lat, 4326),
                 )
             )
             .all()
@@ -62,11 +75,10 @@ class SolarPanelRepository(BaseRepository[SolarPanel]):
 
     def get_nearby_panels(self, lat: float, lon: float, radius_km: float):
         radius_meters = radius_km * 1000  # convert km to meters
-        point = func.ST_GeomFromText(f'POINT({lon} {lat})', 4326)
+        point = func.ST_GeomFromText(f"POINT({lon} {lat})", 4326)
 
-        query = (
-            self.session.query(SolarPanel)
-            .filter(ST_DWithin(SolarPanel.location, point, radius_meters))
+        query = self.session.query(SolarPanel).filter(
+            ST_DWithin(SolarPanel.location, point, radius_meters)
         )
 
         return query.all()

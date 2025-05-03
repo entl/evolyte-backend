@@ -6,11 +6,15 @@ import requests
 
 class WeatherClient(ABC):
     @abstractmethod
-    def fetch_historical_weather(self, latitude, longitude, start_date, end_date, azimuth, tilt) -> dict:
+    def fetch_historical_weather(
+        self, latitude, longitude, start_date, end_date, azimuth, tilt
+    ) -> dict:
         pass
 
     @abstractmethod
-    def fetch_forecast_weather(self, latitude, longitude, start_date, end_date, azimuth, tilt) -> dict:
+    def fetch_forecast_weather(
+        self, latitude, longitude, start_date, end_date, azimuth, tilt
+    ) -> dict:
         pass
 
 
@@ -19,30 +23,40 @@ class OpenMeteoClient(WeatherClient):
     FORECAST_BASE_URL = "https://api.open-meteo.com/v1/forecast"
 
     FIXED_PARAMS = {
-        "hourly": ",".join([
-            "temperature_2m",
-            "apparent_temperature",
-            "relative_humidity_2m",
-            "dew_point_2m",
-            "pressure_msl",
-            "surface_pressure",
-            "precipitation",
-            "cloud_cover",
-            "et0_fao_evapotranspiration",
-            "wind_speed_10m",
-            "wind_direction_10m",
-            "shortwave_radiation",
-            "diffuse_radiation",
-            "direct_radiation",
-            "direct_normal_irradiance",
-            "terrestrial_radiation",
-            "is_day",
-            "sunshine_duration",
-            "weather_code",
-        ])
+        "hourly": ",".join(
+            [
+                "temperature_2m",
+                "apparent_temperature",
+                "relative_humidity_2m",
+                "dew_point_2m",
+                "pressure_msl",
+                "surface_pressure",
+                "precipitation",
+                "cloud_cover",
+                "et0_fao_evapotranspiration",
+                "wind_speed_10m",
+                "wind_direction_10m",
+                "shortwave_radiation",
+                "diffuse_radiation",
+                "direct_radiation",
+                "direct_normal_irradiance",
+                "terrestrial_radiation",
+                "is_day",
+                "sunshine_duration",
+                "weather_code",
+            ]
+        )
     }
 
-    def fetch_historical_weather(self, latitude: float, longitude: float, start_date: datetime, end_date: datetime, azimuth: float, tilt: float) -> dict:
+    def fetch_historical_weather(
+        self,
+        latitude: float,
+        longitude: float,
+        start_date: datetime,
+        end_date: datetime,
+        azimuth: float,
+        tilt: float,
+    ) -> dict:
         params = {
             **self.FIXED_PARAMS,
             "latitude": latitude,
@@ -60,7 +74,15 @@ class OpenMeteoClient(WeatherClient):
         except requests.RequestException as e:
             raise RuntimeError(f"Failed to fetch weather data: {e}")
 
-    def fetch_forecast_weather(self, latitude: float, longitude: float, start_date:datetime, end_date:datetime, azimuth: float, tilt: float) -> dict:
+    def fetch_forecast_weather(
+        self,
+        latitude: float,
+        longitude: float,
+        start_date: datetime,
+        end_date: datetime,
+        azimuth: float,
+        tilt: float,
+    ) -> dict:
         params = {
             **self.FIXED_PARAMS,
             "latitude": latitude,

@@ -1,6 +1,12 @@
 from src.pvgis.client import PVGISAPIClient
-from src.pvgis.schemas import PVGISGridConnectedTrackingPVSystemsRequest, PVGISOffGridRequest, \
-    PVGISMonthlyRadiationRequest, PVGISDailyRadiationRequest, PVGISHourlyRadiationRequest, PVGISTMYRequest
+from src.pvgis.schemas import (
+    PVGISGridConnectedTrackingPVSystemsRequest,
+    PVGISOffGridRequest,
+    PVGISMonthlyRadiationRequest,
+    PVGISDailyRadiationRequest,
+    PVGISHourlyRadiationRequest,
+    PVGISTMYRequest,
+)
 
 
 class PVGISService:
@@ -32,4 +38,3 @@ class PVGISService:
     def get_tmy_data(self, data: PVGISTMYRequest):
         params = {**data.model_dump(exclude_none=True, exclude_unset=True)}
         return self.client.fetch_data("tmy", params)
-

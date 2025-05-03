@@ -13,9 +13,7 @@ from src.core.utils.token_helper import TokenHelper
 
 
 class AuthBackend(AuthenticationBackend):
-    async def authenticate(
-        self, conn: HTTPConnection
-    ) -> Tuple[bool, UUID4]:
+    async def authenticate(self, conn: HTTPConnection) -> Tuple[bool, UUID4]:
         current_user = CurrentUser()
         authorization: str = conn.headers.get("Authorization")
         if not authorization:

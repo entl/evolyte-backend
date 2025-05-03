@@ -1,8 +1,6 @@
 import enum
 
-from sqlalchemy import (
-    Column, Integer, String, Float, DateTime, ForeignKey, func, Enum
-)
+from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, func, Enum
 from sqlalchemy.orm import relationship
 from geoalchemy2 import Geometry
 
@@ -17,10 +15,10 @@ class PanelStatus(enum.Enum):
 
 
 class SolarPanelHourlyRecord(Base):
-    __tablename__ = 'solar_panel_hourly_records'
+    __tablename__ = "solar_panel_hourly_records"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    solar_panel_id = Column(Integer, ForeignKey('solar_panels.id'), nullable=False)
+    solar_panel_id = Column(Integer, ForeignKey("solar_panels.id"), nullable=False)
     timestamp = Column(DateTime, nullable=False)
 
     # Power Production Data
@@ -56,7 +54,7 @@ class SolarPanelHourlyRecord(Base):
 
 
 class SolarPanel(Base):
-    __tablename__ = 'solar_panels'
+    __tablename__ = "solar_panels"
 
     # Identification and Metadata
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -79,15 +77,19 @@ class SolarPanel(Base):
     tilt = Column(Float, nullable=True)  # Tilt angle in degrees
 
     # Operational Data
-    status = Column(Enum(PanelStatus), nullable=True)  # "operational", "maintenance", "offline"
+    status = Column(
+        Enum(PanelStatus), nullable=True
+    )  # "operational", "maintenance", "offline"
 
     # Geolocation Data
-    location = Column(Geometry('POINT', srid=4326), nullable=False)
+    location = Column(Geometry("POINT", srid=4326), nullable=False)
 
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     user = relationship("User", back_populates="solar_panels")
 
-    hourly_records = relationship("SolarPanelHourlyRecord", back_populates="solar_panel")
+    hourly_records = relationship(
+        "SolarPanelHourlyRecord", back_populates="solar_panel"
+    )
 
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())

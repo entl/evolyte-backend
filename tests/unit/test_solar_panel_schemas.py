@@ -35,7 +35,7 @@ def test_solar_panel_base_valid_minimum():
     assert panel.serial_number == payload["serial_number"]
     assert panel.capacity_kw == payload["capacity_kw"]
     assert panel.location == payload["location"]
-    
+
     # Optional fields default to None
     assert panel.manufacturer is None
     assert panel.status is None
@@ -69,15 +69,15 @@ def test_solar_panel_base_all_fields():
 
 def test_solar_panel_base_invalid_types():
     bad = {
-        "serial_number": 123,        
-        "name": None,                
-        "capacity_kw": "five",       
-        "location": [0, 0, 0],      
+        "serial_number": 123,
+        "name": None,
+        "capacity_kw": "five",
+        "location": [0, 0, 0],
     }
     with pytest.raises(ValidationError) as exc:
         SolarPanelBase(**bad)
     errors = exc.value.errors()
-    
+
     # expect errors for serial_number, name, capacity_kw, location length
     fields = {e["loc"][0] for e in errors}
     assert "serial_number" in fields
@@ -165,9 +165,15 @@ def test_solar_panels_cluster_invalid():
 
 def test_clustered_solar_panels_response():
     clusters = [
-        {"latitude": 1.0, "longitude": 2.0, "count": 3,
-         "min_longitude": 1.5, "max_longitude": 2.5,
-         "min_latitude": 0.5, "max_latitude": 2.1},
+        {
+            "latitude": 1.0,
+            "longitude": 2.0,
+            "count": 3,
+            "min_longitude": 1.5,
+            "max_longitude": 2.5,
+            "min_latitude": 0.5,
+            "max_latitude": 2.1,
+        },
     ]
     resp = ClusteredSolarPanelsResponse(clusters=clusters)
     assert isinstance(resp.clusters, list)

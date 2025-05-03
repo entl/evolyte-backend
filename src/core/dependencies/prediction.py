@@ -14,10 +14,12 @@ def prediction_client():
 PredictionClientDep = Annotated[PredictionClient, Depends(prediction_client)]
 
 
-def prediction_service(prediction_client: PredictionClientDep, weather_service: WeatherServiceDep):
-    return PredictionService(weather_service=weather_service, prediction_client=prediction_client)
+def prediction_service(
+    prediction_client: PredictionClientDep, weather_service: WeatherServiceDep
+):
+    return PredictionService(
+        weather_service=weather_service, prediction_client=prediction_client
+    )
 
 
 PredictionServiceDep = Annotated[PredictionService, Depends(prediction_service)]
-
-

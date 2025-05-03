@@ -6,8 +6,12 @@ from typing import List, Optional
 class WeatherRequest(BaseModel):
     latitude: float = Field(..., example=51.5074)
     longitude: float = Field(..., example=-0.1278)
-    azimuth: Optional[float] = Field(None, example=180.0, description="Azimuth angle in degrees")
-    tilt: Optional[float] = Field(None, example=30.0, description="Tilt angle in degrees")
+    azimuth: Optional[float] = Field(
+        None, example=180.0, description="Azimuth angle in degrees"
+    )
+    tilt: Optional[float] = Field(
+        None, example=30.0, description="Tilt angle in degrees"
+    )
     start_date: date = Field(..., example="2024-01-01")
     end_date: date = Field(..., example="2024-01-10")
 

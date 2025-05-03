@@ -18,12 +18,13 @@ from src.weather.routers import weather_router
 from src.settings import settings
 
 # index models
-from src.solar_panels.models import SolarPanel
-from src.user.models import User
+from src.solar_panels.models import SolarPanel  # noqa
+from src.user.models import User  # noqa
 
 # disable warning
 import warnings
-warnings.simplefilter(action='ignore', category=FutureWarning)
+
+warnings.simplefilter(action="ignore", category=FutureWarning)
 
 
 def on_auth_error(request: Request, exc: Exception):
@@ -49,10 +50,8 @@ def make_middleware() -> List[Middleware]:
             allow_headers=["*"],
         ),
         Middleware(
-            AuthenticationMiddleware,
-            backend=AuthBackend(),
-            on_error=on_auth_error
-        )
+            AuthenticationMiddleware, backend=AuthBackend(), on_error=on_auth_error
+        ),
     ]
     return middleware
 

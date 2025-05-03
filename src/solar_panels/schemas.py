@@ -31,11 +31,15 @@ class SolarPanelBase(BaseModel):
 
     status: Optional[PanelStatusEnum] = Field(None, example="operational")
 
-    location: tuple[float, float] = Field(..., example=(51.5074, -0.1278))  # Latitude & Longitude
+    location: tuple[float, float] = Field(
+        ..., example=(51.5074, -0.1278)
+    )  # Latitude & Longitude
 
 
 class SolarPanelCreate(SolarPanelBase):
-    user_id: Optional[int] = Field(None, example=1)  # user id is None for solar panels from open data sources
+    user_id: Optional[int] = Field(
+        None, example=1
+    )  # user id is None for solar panels from open data sources
 
 
 class SolarPanelUpdate(SolarPanelBase):

@@ -2,30 +2,26 @@ from typing import List
 
 from fastapi import APIRouter
 
-from src.solar_panels.schemas import (
-    SolarPanelCreate,
-    SolarPanelUpdate,
-    SolarPanelResponse,
-    PanelStatusEnum,
-    ClusteredSolarPanelsResponse,
-)
 from src.core.dependencies.solar_panels import SolarPanelServiceDep
+from src.solar_panels.schemas import (
+    ClusteredSolarPanelsResponse,
+    PanelStatusEnum,
+    SolarPanelCreate,
+    SolarPanelResponse,
+    SolarPanelUpdate,
+)
 
 solar_panels_router = APIRouter(prefix="/solar-panels", tags=["Solar Panels"])
 
 
 @solar_panels_router.post("/", response_model=SolarPanelResponse)
-def create_solar_panel(
-    solar_panel: SolarPanelCreate, solar_panel_service: SolarPanelServiceDep
-):
+def create_solar_panel(solar_panel: SolarPanelCreate, solar_panel_service: SolarPanelServiceDep):
     new_panel = solar_panel_service.create_solar_panel(solar_panel)
     return new_panel
 
 
 @solar_panels_router.post("/bulk", response_model=List[SolarPanelResponse])
-def create_solar_panels_bulk(
-    solar_panels: List[SolarPanelCreate], solar_panel_service: SolarPanelServiceDep
-):
+def create_solar_panels_bulk(solar_panels: List[SolarPanelCreate], solar_panel_service: SolarPanelServiceDep):
     new_panels = solar_panel_service.create_bulk_solar_panels(solar_panels)
     return new_panels
 
@@ -51,16 +47,12 @@ def get_user_solar_panels(user_id: int, solar_panel_service: SolarPanelServiceDe
 
 
 @solar_panels_router.get("/status/{status}", response_model=List[SolarPanelResponse])
-def get_solar_panels_by_status(
-    status: PanelStatusEnum, solar_panel_service: SolarPanelServiceDep
-):
+def get_solar_panels_by_status(status: PanelStatusEnum, solar_panel_service: SolarPanelServiceDep):
     return solar_panel_service.get_solar_panels_by_status(status)
 
 
 @solar_panels_router.get("/nearby", response_model=List[SolarPanelResponse])
-def get_nearby_solar_panels(
-    lat: float, lon: float, radius: float, solar_panel_service: SolarPanelServiceDep
-):
+def get_nearby_solar_panels(lat: float, lon: float, radius: float, solar_panel_service: SolarPanelServiceDep):
     return solar_panel_service.get_nearby_solar_panels(lat, lon, radius)
 
 
@@ -73,9 +65,7 @@ def get_clustered_solar_panels(
     zoom_level: int,
     solar_panel_service: SolarPanelServiceDep,
 ):
-    panels = solar_panel_service.get_clustered_panels(
-        min_lat, max_lat, min_lon, max_lon, zoom_level
-    )
+    panels = solar_panel_service.get_clustered_panels(min_lat, max_lat, min_lon, max_lon, zoom_level)
     return panels
 
 
@@ -87,9 +77,7 @@ def get_panels_in_bounds(
     max_lon: float,
     solar_panel_service: SolarPanelServiceDep,
 ):
-    return solar_panel_service.get_solar_panel_in_bounds(
-        min_lat, max_lat, min_lon, max_lon
-    )
+    return solar_panel_service.get_solar_panel_in_bounds(min_lat, max_lat, min_lon, max_lon)
 
 
 @solar_panels_router.delete("/{panel_id}", status_code=204)

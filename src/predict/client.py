@@ -1,10 +1,10 @@
 import requests
 
 from src.predict.schemas import (
-    PredictionClientRequest,
-    PredictionClientResponse,
     BatchPredictionClientRequest,
     BatchPredictionClientResponse,
+    PredictionClientRequest,
+    PredictionClientResponse,
 )
 from src.settings import settings
 
@@ -25,9 +25,7 @@ class PredictionClient:
         except requests.RequestException as e:
             raise RuntimeError(f"Failed to fetch prediction: {e}")
 
-    def batch_predict(
-        self, request: BatchPredictionClientRequest
-    ) -> BatchPredictionClientResponse:
+    def batch_predict(self, request: BatchPredictionClientRequest) -> BatchPredictionClientResponse:
         try:
             response = requests.post(
                 f"{self.base_url}/prediction/batch-predict",
@@ -35,9 +33,7 @@ class PredictionClient:
                 headers={"Content-Type": "application/json"},
             )
             response.raise_for_status()
-            test = BatchPredictionClientResponse.model_validate(
-                response.json(), from_attributes=True
-            )
+            test = BatchPredictionClientResponse.model_validate(response.json(), from_attributes=True)
             return test
         except requests.RequestException as e:
             raise RuntimeError(f"Failed to fetch batch prediction: {e}")

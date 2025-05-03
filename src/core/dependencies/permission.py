@@ -5,11 +5,11 @@ from fastapi import Request
 from fastapi.openapi.models import APIKey, APIKeyIn
 from fastapi.security.base import SecurityBase
 
-from src.user.repository import UserRepository
-from src.user.service import UserService
+from src.core.db.session import SessionFactory
 from src.core.exceptions.base import CustomException, UnauthorizedException
 from src.schemas import CurrentUser
-from src.core.db.session import SessionFactory
+from src.user.repository import UserRepository
+from src.user.service import UserService
 
 
 class Permissions:

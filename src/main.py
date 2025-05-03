@@ -1,28 +1,26 @@
+# disable warning
+import warnings
 from typing import List
 
-from fastapi import FastAPI, APIRouter, Request
+from fastapi import APIRouter, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware import Middleware
 from starlette.responses import JSONResponse
 
-from src.core.middlewares.auth_middleware import AuthenticationMiddleware, AuthBackend
-from src.core.exceptions.base import CustomException
-from src.health.routers import health_router
-from src.user.routers import users_router
 from src.auth.routers import auth_router
-from src.solar_panels.routers import solar_panels_router
-from src.pvgis.routers import pvgis_router
+from src.core.exceptions.base import CustomException
+from src.core.middlewares.auth_middleware import AuthBackend, AuthenticationMiddleware
+from src.health.routers import health_router
 from src.predict.routers import predict_router
-from src.weather.routers import weather_router
-
+from src.pvgis.routers import pvgis_router
 from src.settings import settings
 
 # index models
 from src.solar_panels.models import SolarPanel  # noqa
+from src.solar_panels.routers import solar_panels_router
 from src.user.models import User  # noqa
-
-# disable warning
-import warnings
+from src.user.routers import users_router
+from src.weather.routers import weather_router
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
@@ -49,9 +47,7 @@ def make_middleware() -> List[Middleware]:
             allow_methods=["*"],
             allow_headers=["*"],
         ),
-        Middleware(
-            AuthenticationMiddleware, backend=AuthBackend(), on_error=on_auth_error
-        ),
+        Middleware(AuthenticationMiddleware, backend=AuthBackend(), on_error=on_auth_error),
     ]
     return middleware
 

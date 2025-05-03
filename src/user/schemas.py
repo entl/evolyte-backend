@@ -1,7 +1,7 @@
 from datetime import datetime
-from typing import Optional, Annotated
+from typing import Annotated, Optional
 
-from pydantic import EmailStr, Field, BaseModel
+from pydantic import BaseModel, EmailStr, Field
 
 
 class UserBase(BaseModel):
@@ -30,12 +30,8 @@ class UserBase(BaseModel):
         Field(min_length=1, max_length=128, description="The full name of the user"),
     ]
 
-    created_at: Annotated[
-        datetime, Field(..., description="The datetime of the user's creation")
-    ]
-    updated_at: Annotated[
-        datetime, Field(..., description="The datetime of the user's last update")
-    ]
+    created_at: Annotated[datetime, Field(..., description="The datetime of the user's creation")]
+    updated_at: Annotated[datetime, Field(..., description="The datetime of the user's last update")]
 
 
 class UserCreate(UserBase):

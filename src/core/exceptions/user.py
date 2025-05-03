@@ -1,5 +1,6 @@
-from src.core.exceptions.base import CustomException
 from fastapi import status
+
+from src.core.exceptions.base import CustomException
 
 
 class PasswordDoesNotMatchException(CustomException):

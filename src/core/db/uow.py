@@ -1,9 +1,8 @@
 from abc import ABC, abstractmethod
-
-from sqlalchemy.orm import Session
+from typing import TypeVar
 
 from sqlalchemy.ext.declarative import DeclarativeMeta
-from typing import TypeVar
+from sqlalchemy.orm import Session
 
 from src.solar_panels.repository import SolarPanelRepository
 from src.user.repository import UserRepository

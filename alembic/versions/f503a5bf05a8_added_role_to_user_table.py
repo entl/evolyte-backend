@@ -8,9 +8,9 @@ Create Date: 2025-02-21 21:39:32.020203
 
 from typing import Sequence, Union
 
-from alembic import op
 import sqlalchemy as sa
 
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = "f503a5bf05a8"
@@ -25,9 +25,7 @@ def upgrade() -> None:
     role_enum.create(op.get_bind())  # Explicitly create the type in PostgreSQL
 
     # Add the role column using the ENUM type
-    op.add_column(
-        "users", sa.Column("role", role_enum, nullable=False, server_default="USER")
-    )
+    op.add_column("users", sa.Column("role", role_enum, nullable=False, server_default="USER"))
 
 
 def downgrade() -> None:

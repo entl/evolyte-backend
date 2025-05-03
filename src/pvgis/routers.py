@@ -4,11 +4,11 @@ from fastapi import APIRouter, Query
 
 from src.core.dependencies.pvgis import PVGISServiceDep
 from src.pvgis.schemas import (
-    PVGISGridConnectedTrackingPVSystemsRequest,
-    PVGISOffGridRequest,
-    PVGISMonthlyRadiationRequest,
     PVGISDailyRadiationRequest,
+    PVGISGridConnectedTrackingPVSystemsRequest,
     PVGISHourlyRadiationRequest,
+    PVGISMonthlyRadiationRequest,
+    PVGISOffGridRequest,
     PVGISTMYRequest,
 )
 
@@ -25,9 +25,7 @@ def get_pv_performance(
 
 
 @pvgis_router.get("/offgrid")
-def get_offgrid_pv(
-    data: Annotated[PVGISOffGridRequest, Query()], pvgis_service: PVGISServiceDep
-):
+def get_offgrid_pv(data: Annotated[PVGISOffGridRequest, Query()], pvgis_service: PVGISServiceDep):
     """Fetches off-grid PV system data."""
     return pvgis_service.get_offgrid_pv(data)
 
@@ -42,9 +40,7 @@ def get_monthly_radiation(
 
 
 @pvgis_router.get("/radiation/daily")
-def get_daily_radiation(
-    data: Annotated[PVGISDailyRadiationRequest, Query()], pvgis_service: PVGISServiceDep
-):
+def get_daily_radiation(data: Annotated[PVGISDailyRadiationRequest, Query()], pvgis_service: PVGISServiceDep):
     """Fetches daily radiation data for a specific month."""
     return pvgis_service.get_daily_radiation(data)
 
@@ -59,8 +55,6 @@ def get_hourly_radiation(
 
 
 @pvgis_router.get("/radiation/tmy")
-def get_tmy_data(
-    data: Annotated[PVGISTMYRequest, Query()], pvgis_service: PVGISServiceDep
-):
+def get_tmy_data(data: Annotated[PVGISTMYRequest, Query()], pvgis_service: PVGISServiceDep):
     """Fetches Typical Meteorological Year (TMY) data."""
     return pvgis_service.get_tmy_data(data)

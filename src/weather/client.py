@@ -6,15 +6,11 @@ import requests
 
 class WeatherClient(ABC):
     @abstractmethod
-    def fetch_historical_weather(
-        self, latitude, longitude, start_date, end_date, azimuth, tilt
-    ) -> dict:
+    def fetch_historical_weather(self, latitude, longitude, start_date, end_date, azimuth, tilt) -> dict:
         pass
 
     @abstractmethod
-    def fetch_forecast_weather(
-        self, latitude, longitude, start_date, end_date, azimuth, tilt
-    ) -> dict:
+    def fetch_forecast_weather(self, latitude, longitude, start_date, end_date, azimuth, tilt) -> dict:
         pass
 
 

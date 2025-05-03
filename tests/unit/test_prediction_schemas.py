@@ -1,18 +1,19 @@
-import pytest
 from datetime import datetime, timedelta
+
+import pytest
 from pydantic import ValidationError
 
 from src.predict.schemas import (
-    PredictionRequest,
-    PredictionResponse,
+    BatchPredictionClientRequest,
+    BatchPredictionClientResponse,
     BatchPredictionRequest,
     BatchPredictionResponse,
-    TimeSeriesPredictionRequest,
     FeatureInput,
     PredictionClientRequest,
     PredictionClientResponse,
-    BatchPredictionClientRequest,
-    BatchPredictionClientResponse,
+    PredictionRequest,
+    PredictionResponse,
+    TimeSeriesPredictionRequest,
 )
 
 
@@ -146,9 +147,7 @@ def test_time_series_prediction_request_dates_too_far_ahead():
     with pytest.raises(ValidationError) as exc:
         TimeSeriesPredictionRequest(**payload)
     messages = [e["msg"] for e in exc.value.errors()]
-    assert any(
-        "Forecast dates must not be more than 16 days in advance" in m for m in messages
-    )
+    assert any("Forecast dates must not be more than 16 days in advance" in m for m in messages)
 
 
 def test_feature_input_valid_and_missing_fields():
@@ -219,7 +218,5 @@ def test_prediction_client_models_and_batches():
     batch_cli_req = BatchPredictionClientRequest(entries=[cli_req, cli_req])
     assert len(batch_cli_req.entries) == 2
 
-    batch_cli_resp = BatchPredictionClientResponse(
-        predictions=[{"prediction": 1.1, "datetime": "2025-01-01T11:00:00"}]
-    )
+    batch_cli_resp = BatchPredictionClientResponse(predictions=[{"prediction": 1.1, "datetime": "2025-01-01T11:00:00"}])
     assert len(batch_cli_resp.predictions) == 1

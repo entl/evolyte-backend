@@ -4,10 +4,10 @@ from fastapi import APIRouter, Query
 
 from src.core.dependencies.prediction import PredictionServiceDep
 from src.predict.schemas import (
-    PredictionRequest,
-    PredictionResponse,
     BatchPredictionRequest,
     BatchPredictionResponse,
+    PredictionRequest,
+    PredictionResponse,
     TimeSeriesPredictionRequest,
 )
 
@@ -23,9 +23,7 @@ def predict_solar_panel_output(
 
 
 @predict_router.post("/batch", response_model=BatchPredictionResponse)
-def predict_solar_panel_output_batch(
-    request: BatchPredictionRequest, prediction_service: PredictionServiceDep
-):
+def predict_solar_panel_output_batch(request: BatchPredictionRequest, prediction_service: PredictionServiceDep):
     return prediction_service.predict_batch(request)
 
 

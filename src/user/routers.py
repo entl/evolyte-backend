@@ -3,18 +3,17 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, status
 from pydantic import UUID4
 
-from src.user.schemas import UserCreate, UserResponse, UserUpdate
-from src.user.service import UserService
-
-from src.core.exceptions.user import InsufficientPermissions, UserNotFoundException
 from src.core.dependencies.permission import (
-    PermissionDependencyHTTP,
-    IsAuthenticated,
     IsAdmin,
+    IsAuthenticated,
+    PermissionDependencyHTTP,
     Permissions,
 )
 from src.core.dependencies.user import UserServiceDep
+from src.core.exceptions.user import InsufficientPermissions, UserNotFoundException
 from src.schemas import CurrentUser
+from src.user.schemas import UserCreate, UserResponse, UserUpdate
+from src.user.service import UserService
 
 users_router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -94,9 +93,7 @@ def create_user(user_service: UserServiceDep, user: UserCreate):
 def update_user(
     user_service: UserServiceDep,
     updated_user: UserUpdate,
-    current_user: Annotated[
-        CurrentUser, Depends(PermissionDependencyHTTP([IsAuthenticated, IsAdmin]))
-    ],
+    current_user: Annotated[CurrentUser, Depends(PermissionDependencyHTTP([IsAuthenticated, IsAdmin]))],
 ):
     """
     Update a user.
@@ -109,24 +106,17 @@ def update_user(
     Returns:
         UserResponse: Updated user data.
     """
-    if (
-        current_user.id == updated_user.id
-        or Permissions.IsAdmin in current_user.permissions
-    ):
+    if current_user.id == updated_user.id or Permissions.IsAdmin in current_user.permissions:
         return user_service.update_user(updated_user)
     else:
         raise InsufficientPermissions()
 
 
-@users_router.delete(
-    "/{user_id}", status_code=status.HTTP_204_NO_CONTENT, dependencies=[]
-)
+@users_router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT, dependencies=[])
 def delete_user(
     user_service: UserServiceDep,
     user_id: UUID4,
-    current_user: Annotated[
-        CurrentUser, Depends(PermissionDependencyHTTP([IsAuthenticated, IsAdmin]))
-    ],
+    current_user: Annotated[CurrentUser, Depends(PermissionDependencyHTTP([IsAuthenticated, IsAdmin]))],
 ):
     """
     Delete a user.

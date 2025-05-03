@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
-from .models import User
+
 from ..repository import BaseRepository
+from .models import User
 
 
 class UserRepository(BaseRepository[User]):

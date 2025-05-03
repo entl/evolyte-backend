@@ -2,8 +2,8 @@ from datetime import datetime, timedelta
 
 import jwt
 
-from src.settings import settings
 from src.core.exceptions.token import DecodeTokenException, ExpiredTokenException
+from src.settings import settings
 
 
 class TokenHelper:

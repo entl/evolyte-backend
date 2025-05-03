@@ -1,16 +1,16 @@
-from typing import Optional, List
-from .schemas import UserResponse, UserCreate, UserUpdate, LoginResponse
-from .models import User
+from typing import List, Optional
 
+from src.core.db.uow import UnitOfWork
 from src.core.exceptions.user import (
-    UserNotFoundException,
+    DuplicateEmailOrUsernameException,
     PasswordDoesNotMatchException,
+    UserNotFoundException,
 )
-from src.core.exceptions.user import DuplicateEmailOrUsernameException
-
 from src.core.utils import password_helper
 from src.core.utils.token_helper import TokenHelper
-from src.core.db.uow import UnitOfWork
+
+from .models import User
+from .schemas import LoginResponse, UserCreate, UserResponse, UserUpdate
 
 
 class UserService:

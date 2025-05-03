@@ -154,9 +154,7 @@ def test_update_user_success(mock_uow):
     # Mock get existing user
     mock_uow.users.get_by.return_value = test_user
 
-    new_data = UserUpdate(
-        id=1, username="newname", email="newname@test.com", full_name="New Name"
-    )
+    new_data = UserUpdate(id=1, username="newname", email="newname@test.com", full_name="New Name")
 
     # Mock update
     updated_user = User(

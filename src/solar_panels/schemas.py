@@ -1,7 +1,8 @@
-from pydantic import BaseModel, Field
 from datetime import datetime
-from typing import Optional
 from enum import Enum
+from typing import Optional
+
+from pydantic import BaseModel, Field
 
 
 class PanelStatusEnum(str, Enum):
@@ -31,15 +32,11 @@ class SolarPanelBase(BaseModel):
 
     status: Optional[PanelStatusEnum] = Field(None, example="operational")
 
-    location: tuple[float, float] = Field(
-        ..., example=(51.5074, -0.1278)
-    )  # Latitude & Longitude
+    location: tuple[float, float] = Field(..., example=(51.5074, -0.1278))  # Latitude & Longitude
 
 
 class SolarPanelCreate(SolarPanelBase):
-    user_id: Optional[int] = Field(
-        None, example=1
-    )  # user id is None for solar panels from open data sources
+    user_id: Optional[int] = Field(None, example=1)  # user id is None for solar panels from open data sources
 
 
 class SolarPanelUpdate(SolarPanelBase):

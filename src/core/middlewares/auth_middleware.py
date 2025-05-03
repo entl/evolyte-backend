@@ -7,9 +7,9 @@ from starlette.middleware.authentication import (
 )
 from starlette.requests import HTTPConnection
 
-from src.schemas import CurrentUser
 from src.core.exceptions.token import TokenException
 from src.core.utils.token_helper import TokenHelper
+from src.schemas import CurrentUser
 
 
 class AuthBackend(AuthenticationBackend):

@@ -1,6 +1,5 @@
 from fastapi import APIRouter, status
 
-
 health_router = APIRouter(prefix="/health", tags=["Health"])
 
 

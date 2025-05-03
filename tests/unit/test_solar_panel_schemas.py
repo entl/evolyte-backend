@@ -1,15 +1,16 @@
-import pytest
 from datetime import datetime
+
+import pytest
 from pydantic import ValidationError
 
 from src.solar_panels.schemas import (
+    ClusteredSolarPanelsResponse,
     PanelStatusEnum,
     SolarPanelBase,
     SolarPanelCreate,
-    SolarPanelUpdate,
     SolarPanelResponse,
     SolarPanelsCluster,
-    ClusteredSolarPanelsResponse,
+    SolarPanelUpdate,
 )
 
 

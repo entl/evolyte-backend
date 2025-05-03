@@ -1,7 +1,8 @@
-from typing import Type, TypeVar, Generic, Optional, List
-from sqlalchemy.orm import Session
+from typing import Generic, List, Optional, Type, TypeVar
+
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.declarative import DeclarativeMeta
+from sqlalchemy.orm import Session
 
 T = TypeVar("T", bound=DeclarativeMeta)
 

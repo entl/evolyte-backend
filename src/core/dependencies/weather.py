@@ -2,8 +2,8 @@ from typing import Annotated
 
 from fastapi import Depends
 
-from src.weather.service import WeatherService
 from src.weather.client import OpenMeteoClient
+from src.weather.service import WeatherService
 
 
 def weather_client():

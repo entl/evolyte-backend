@@ -1,10 +1,10 @@
 from src.pvgis.client import PVGISAPIClient
 from src.pvgis.schemas import (
-    PVGISGridConnectedTrackingPVSystemsRequest,
-    PVGISOffGridRequest,
-    PVGISMonthlyRadiationRequest,
     PVGISDailyRadiationRequest,
+    PVGISGridConnectedTrackingPVSystemsRequest,
     PVGISHourlyRadiationRequest,
+    PVGISMonthlyRadiationRequest,
+    PVGISOffGridRequest,
     PVGISTMYRequest,
 )
 

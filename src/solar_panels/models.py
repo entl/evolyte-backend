@@ -1,8 +1,8 @@
 import enum
 
-from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, func, Enum
-from sqlalchemy.orm import relationship
 from geoalchemy2 import Geometry
+from sqlalchemy import Column, DateTime, Enum, Float, ForeignKey, Integer, String, func
+from sqlalchemy.orm import relationship
 
 from src.core.db.session import Base
 
@@ -77,9 +77,7 @@ class SolarPanel(Base):
     tilt = Column(Float, nullable=True)  # Tilt angle in degrees
 
     # Operational Data
-    status = Column(
-        Enum(PanelStatus), nullable=True
-    )  # "operational", "maintenance", "offline"
+    status = Column(Enum(PanelStatus), nullable=True)  # "operational", "maintenance", "offline"
 
     # Geolocation Data
     location = Column(Geometry("POINT", srid=4326), nullable=False)
@@ -87,9 +85,7 @@ class SolarPanel(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     user = relationship("User", back_populates="solar_panels")
 
-    hourly_records = relationship(
-        "SolarPanelHourlyRecord", back_populates="solar_panel"
-    )
+    hourly_records = relationship("SolarPanelHourlyRecord", back_populates="solar_panel")
 
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())

@@ -1,4 +1,5 @@
 from unittest.mock import MagicMock, PropertyMock
+
 import pytest
 
 

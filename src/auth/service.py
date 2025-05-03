@@ -1,7 +1,7 @@
-from .schemas import RefreshTokenBase
-
 from src.core.exceptions.token import DecodeTokenException
 from src.core.utils.token_helper import TokenHelper
+
+from .schemas import RefreshTokenBase
 
 
 class JwtService:

@@ -2,9 +2,10 @@ from typing import Annotated
 
 from fastapi import Depends
 
+from src.core.db.session import SessionFactory
 from src.user.repository import UserRepository
 from src.user.service import UserService
-from src.core.db.session import SessionFactory
+
 from .db import UowDep
 
 

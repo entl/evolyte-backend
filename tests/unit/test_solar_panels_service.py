@@ -5,9 +5,9 @@ from geoalchemy2.shape import from_shape
 from shapely.geometry import Point
 
 from src.core.exceptions.solar_panels import SolarPanelNotFoundException
-from src.solar_panels.service import SolarPanelService
+from src.solar_panels.models import PanelStatus, SolarPanel
 from src.solar_panels.schemas import SolarPanelCreate
-from src.solar_panels.models import SolarPanel, PanelStatus
+from src.solar_panels.service import SolarPanelService
 
 
 @pytest.fixture
@@ -67,9 +67,7 @@ def sample_solar_panels():
     ]
 
 
-def test_get_all_solar_panels_success(
-    solar_panels_service, sample_solar_panels, mock_uow
-):
+def test_get_all_solar_panels_success(solar_panels_service, sample_solar_panels, mock_uow):
     mock_uow.solar_panels.get_all.return_value = sample_solar_panels
     solar_panels = solar_panels_service.get_all_solar_panels()
     assert len(solar_panels) == 2
@@ -79,9 +77,7 @@ def test_get_all_solar_panels_success(
     assert solar_panels[1].name == "London Garden Panel"
 
 
-def test_get_solar_panel_by_id_success(
-    solar_panels_service, sample_solar_panels, mock_uow
-):
+def test_get_solar_panel_by_id_success(solar_panels_service, sample_solar_panels, mock_uow):
     mock_uow.solar_panels.get_by.return_value = sample_solar_panels[0]
     solar_panel = solar_panels_service.get_solar_panel_by_id(1)
 

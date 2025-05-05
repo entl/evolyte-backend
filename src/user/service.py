@@ -3,14 +3,12 @@ from typing import List, Optional
 from src.core.db.uow import UnitOfWork
 from src.core.exceptions.user import (
     DuplicateEmailOrUsernameException,
-    PasswordDoesNotMatchException,
     UserNotFoundException,
 )
 from src.core.utils import password_helper
-from src.core.utils.token_helper import TokenHelper
 
 from .models import User
-from .schemas import LoginResponse, UserCreate, UserResponse, UserUpdate
+from .schemas import UserCreate, UserResponse, UserUpdate
 
 
 class UserService:
@@ -45,7 +43,7 @@ class UserService:
             hashed_password = password_helper.hash(user.password)
             user.password = hashed_password
 
-            new_user = User(**user.model_dump())
+            new_user = User(**user.model_dump(exclude={"password_confirmation"}))
             created_user = self.uow.users.create(new_user)
 
             return UserResponse.model_validate(created_user)
@@ -65,19 +63,6 @@ class UserService:
             updated_user = self.uow.users.update(user)
 
             return UserResponse.model_validate(updated_user)
-
-    def login(self, email: str, password: str) -> LoginResponse:
-        user = self.uow.users.get_by(email=email)
-        if not user:
-            raise UserNotFoundException()
-        if not password_helper.verify(password, user.password):
-            raise PasswordDoesNotMatchException()
-
-        return LoginResponse(
-            access_token=TokenHelper.encode(payload={"user_id": str(user.id)}),
-            refresh_token=TokenHelper.encode(payload={"sub": "refresh"}),
-            token_type="bearer",
-        )
 
     def is_admin(self, user_id: int) -> bool:
         user = self.uow.users.get_by(id=user_id)

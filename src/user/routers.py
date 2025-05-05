@@ -41,6 +41,31 @@ def get_all_users(user_service: UserServiceDep):
 
 
 @users_router.get(
+    "/me",
+    response_model=UserResponse,
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(PermissionDependencyHTTP([IsAuthenticated]))],
+)
+def get_current_user(
+    user_service: UserServiceDep,
+    current_user: Annotated[CurrentUser, Depends(PermissionDependencyHTTP([IsAuthenticated]))],
+):
+    """
+    Get current user.
+
+    This endpoint retrieves the currently authenticated user.
+
+    Args:
+        user_service (UserService): User Service instance.
+        current_user (CurrentUser): The currently authenticated user.
+
+    Returns:
+        UserResponse: The currently authenticated user.
+    """
+    return user_service.get_user_by_id(user_id=current_user.id)
+
+
+@users_router.get(
     "/{user_id}",
     response_model=UserResponse,
     status_code=status.HTTP_200_OK,

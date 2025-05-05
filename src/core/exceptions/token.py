@@ -15,3 +15,9 @@ class ExpiredTokenException(TokenException):
     code = 400
     error_code = "TOKEN__EXPIRE_ERROR"
     message = "JWT token has expired"
+
+
+class TokenValidationError(TokenException):
+    code = 401
+    error_code = "TOKEN__VALIDATION_ERROR"
+    message = "Token validation error"

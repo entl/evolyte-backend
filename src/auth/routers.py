@@ -10,10 +10,7 @@ from src.core.dependencies.auth import AuthServiceDep
 auth_router = APIRouter(prefix="/auth", tags=["Auth"])
 
 
-@auth_router.post(
-    "/refresh",
-    response_model=TokenResponse
-)
+@auth_router.post("/refresh", response_model=TokenResponse)
 def refresh_token(request: Request, response: Response, auth_service: AuthServiceDep):
     refresh_token = request.cookies.get("refresh_token")
     if not refresh_token:
@@ -30,9 +27,7 @@ def refresh_token(request: Request, response: Response, auth_service: AuthServic
         max_age=60 * 60 * 24 * 30,  # 30 days
     )
 
-    return TokenResponse(
-        access_token=token_pair.access_token
-    )
+    return TokenResponse(access_token=token_pair.access_token)
 
 
 @auth_router.post("/verify", status_code=status.HTTP_200_OK)
@@ -58,6 +53,4 @@ def login(
         max_age=60 * 60 * 24 * 30,  # 30 days
     )
 
-    return TokenResponse(
-        access_token=token_pair.access_token
-    )
+    return TokenResponse(access_token=token_pair.access_token)

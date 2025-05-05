@@ -1,19 +1,25 @@
+from typing import Literal, Optional
+
 from pydantic import BaseModel, Field
 
 
-class RefreshTokenBase(BaseModel):
-    access_token: str = Field(..., description="Token")
+# Token schemas
+class TokenPayload(BaseModel):
+    user_id: int = Field(..., description="User ID")
+    sub: Literal["access", "refresh"] = Field(..., description="Token type")
+    exp: int = Field(..., description="Expiration time of the token")
+
+
+class TokenPair(BaseModel):
+    access_token: str = Field(..., description="Access token")
     refresh_token: str = Field(..., description="Refresh token")
-    token_type: str = Field(..., description="Token type")
+    token_type: str = Field(default="bearer", description="Type of token")
 
 
-class RefreshTokenRequest(RefreshTokenBase):
-    pass
-
-
-class RefreshTokenResponse(RefreshTokenBase):
-    pass
+class TokenResponse(BaseModel):
+    access_token: str = Field(..., description="Token")
+    token_type: str = Field(default="bearer", description="Type of token")
 
 
 class VerifyTokenRequest(BaseModel):
-    token: str = Field(..., description="Token")
+    access_token: str = Field(..., description="Token")

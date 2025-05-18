@@ -15,15 +15,15 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    username = Column(String, unique=True, nullable=False)
     email = Column(String, unique=True, nullable=False)
     full_name = Column(String, nullable=False)
-    password = Column(String, nullable=False)
+    password = Column(String, nullable=True)
 
     role = Column(Enum(Roles), nullable=False, default=Roles.USER)
 
     # Relationships
     solar_panels = relationship("SolarPanel", back_populates="user")
+    identities = relationship("Identity", back_populates="user")
 
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())

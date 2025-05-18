@@ -14,7 +14,6 @@ def sample_users():
     return [
         User(
             id=1,
-            username="johndoe",
             email="john@example.com",
             password="hashed_pass",
             role="user",
@@ -24,7 +23,6 @@ def sample_users():
         ),
         User(
             id=2,
-            username="admin",
             email="admin@example.com",
             password="hashed_admin",
             role="admin",
@@ -42,9 +40,8 @@ def test_get_all_users_returns_all_users(mock_uow, sample_users):
     result = service.get_all_users()
 
     assert len(result) == 2
-    assert result[0].username == "johndoe"
-    assert result[1].username == "admin"
-
+    assert result[0].id == sample_users[0].id
+    assert result[1].id == sample_users[1].id
 
 def test_get_user_by_id_returns_correct_user(mock_uow, sample_users):
     test_user = sample_users[0]
@@ -55,25 +52,9 @@ def test_get_user_by_id_returns_correct_user(mock_uow, sample_users):
 
     assert result is not None
     assert result.id == test_user.id
-    assert result.username == test_user.username
     assert result.email == test_user.email
 
     mock_uow.users.get_by.assert_called_once_with(id=test_user.id)
-
-
-def test_get_user_by_username_returns_correct_user(mock_uow, sample_users):
-    test_user = sample_users[0]
-    mock_uow.users.get_by.return_value = test_user
-    service = UserService(mock_uow)
-
-    result = service.get_user_by_username(test_user.username)
-
-    assert result is not None
-    assert result.id == test_user.id
-    assert result.username == test_user.username
-    assert result.email == test_user.email
-
-    mock_uow.users.get_by.assert_called_once_with(username=test_user.username)
 
 
 def test_create_user_raises_exception_on_duplicate_email(mock_uow):
@@ -81,7 +62,6 @@ def test_create_user_raises_exception_on_duplicate_email(mock_uow):
 
     test = User(
         id=3,
-        username="test",
         email="test@example.com",
         password="hashedpass123",
         created_at=datetime.now(),
@@ -91,7 +71,6 @@ def test_create_user_raises_exception_on_duplicate_email(mock_uow):
     mock_uow.users.get_by.side_effect = [test]
 
     user = UserCreate(
-        username="test",
         email="test@example.com",
         password="12345678",
         password_confirmation="12345678",
@@ -112,7 +91,6 @@ def test_create_user_raises_success(mock_uow):
 
     test_user = User(
         id=3,
-        username="test",
         email="test@example.com",
         password="hashedpass123",
         full_name="test user",
@@ -122,7 +100,6 @@ def test_create_user_raises_success(mock_uow):
     mock_uow.users.create.return_value = test_user
 
     user_create = UserCreate(
-        username="test",
         email="test@example.com",
         password="12345678",
         password_confirmation="12345678",
@@ -134,7 +111,6 @@ def test_create_user_raises_success(mock_uow):
     result = service.create_user(user_create)
 
     assert result is not None
-    assert result.username == "test"
     assert result.email == "test@example.com"
 
     mock_uow.users.create.assert_called_once()
@@ -145,7 +121,6 @@ def test_update_user_success(mock_uow):
 
     test_user = User(
         id=1,
-        username="oldname",
         email="old@example.com",
         password="oldpass123",
         full_name="Old Name",
@@ -156,12 +131,11 @@ def test_update_user_success(mock_uow):
     # Mock get existing user
     mock_uow.users.get_by.return_value = test_user
 
-    new_data = UserUpdate(id=1, username="newname", email="newname@test.com", full_name="New Name")
+    new_data = UserUpdate(id=1, email="newname@test.com", full_name="New Name")
 
     # Mock update
     updated_user = User(
         id=1,
-        username="newname",
         email="new@example.com",
         password="oldpass123",
         full_name="New Name",
@@ -174,7 +148,6 @@ def test_update_user_success(mock_uow):
 
     assert result is not None
     assert result.id == 1
-    assert result.username == "newname"
     assert result.email == "new@example.com"
     assert result.full_name == "New Name"
 

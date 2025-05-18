@@ -2,8 +2,7 @@ from typing import List, Optional
 
 from src.core.db.uow import UnitOfWork
 from src.core.exceptions.user import (
-    DuplicateEmailOrUsernameException,
-    UserNotFoundException,
+    DuplicateEmailOrUsernameException,    UserNotFoundException,
 )
 from src.core.utils import password_helper
 
@@ -23,10 +22,6 @@ class UserService:
         user = self.uow.users.get_by(id=user_id)
         return UserResponse.model_validate(user) if user else None
 
-    def get_user_by_username(self, username: str) -> Optional[UserResponse]:
-        user = self.uow.users.get_by(username=username)
-        return UserResponse.model_validate(user) if user else None
-
     def get_user_by_email(self, email: str) -> Optional[UserResponse]:
         user = self.uow.users.get_by(email=email)
         return UserResponse.model_validate(user) if user else None
@@ -34,8 +29,6 @@ class UserService:
     def create_user(self, user: UserCreate) -> UserResponse:
         with self.uow:
             # Check for duplicate username or email
-            if self.uow.users.get_by(username=user.username):
-                raise DuplicateEmailOrUsernameException()
             if self.uow.users.get_by(email=user.email):
                 raise DuplicateEmailOrUsernameException()
 

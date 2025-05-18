@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from ..repository import BaseRepository
+from src.repository import BaseRepository
 from .models import User
 
 

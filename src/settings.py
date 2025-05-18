@@ -10,11 +10,17 @@ class Settings(BaseSettings):
 
     jwt_secret_key: str
     jwt_algorithm: str
-    jwt_token_expire_minutes: int
+    jwt_token_expiration_time: int  # in seconds
+    jwt_refresh_token_expiration_time: int  # in seconds
 
     ml_api_url: str
 
+    google_client_id: str
+    google_client_secret: str
+
     cors_origins: list[str]
+
+    env: str
 
     class Config:
         env_file = ".env.dev"

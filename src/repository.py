@@ -1,10 +1,11 @@
 from typing import Generic, List, Optional, Type, TypeVar
 
 from sqlalchemy.exc import NoResultFound
-from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.orm import Session
 
-T = TypeVar("T", bound=DeclarativeMeta)
+from src.core.db.session import Base
+
+T = TypeVar("T", bound=Base)
 
 
 class BaseRepository(Generic[T]):
@@ -18,6 +19,9 @@ class BaseRepository(Generic[T]):
             return self.session.query(self.model).filter_by(**filters).first()
         except NoResultFound:
             return None
+
+    def filter_by(self, **filters) -> List[T]:
+        return self.session.query(self.model).filter_by(**filters).all()
 
     def get_all(self) -> List[T]:
         return self.session.query(self.model).all()

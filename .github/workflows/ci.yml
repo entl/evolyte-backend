@@ -23,9 +23,14 @@ jobs:
       PG_DATABASE_USERNAME: ${{secrets.PG_DATABASE_USERNAME}}
       JWT_SECRET_KEY: ${{secrets.JWT_SECRET_KEY}}
       JWT_ALGORITHM: ${{secrets.JWT_ALGORITHM}}
-      jwt_token_expire_minutes: ${{secrets.jwt_token_expire_minutes}}
+      JWT_TOKEN_EXPIRATION_TIME: ${{secrets.JWT_TOKEN_EXPIRATION_TIME}}
+      JWT_REFRESH_TOKEN_EXPIRATION_TIME: ${{secrets.JWT_REFRESH_TOKEN_EXPIRATION_TIME}}
+      GOOGLE_CLIENT_ID: ${{secrets.GOOGLE_CLIENT_ID}}
+      GOOGLE_CLIENT_SECRET: ${{secrets.GOOGLE_CLIENT_SECRET}}
+      ENV: ${{secrets.ENV}}
       ML_API_URL: ${{secrets.ML_API_URL}}
       CORS_ORIGINS: ${{secrets.CORS_ORIGINS}}
+
     runs-on: ubuntu-latest
     needs: lint
     steps:

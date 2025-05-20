@@ -4,7 +4,7 @@ from sqlalchemy import engine_from_config, pool
 
 from alembic import context
 from src.core.db.session import Base
-from src.main import SolarPanel, User  # noqa
+from src.main import SolarPanel, User, Identity  # noqa
 from src.settings import settings
 
 # this is the Alembic Config object, which provides

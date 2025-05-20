@@ -10,15 +10,14 @@ class TokenPayload(BaseModel):
     exp: int = Field(..., description="Expiration time of the token")
 
 
-class TokenPair(BaseModel):
-    access_token: str = Field(..., description="Access token")
-    refresh_token: str = Field(..., description="Refresh token")
-    token_type: str = Field(default="bearer", description="Type of token")
-
-
-class TokenResponse(BaseModel):
+class TokenPairResponse(BaseModel):
     access_token: str = Field(..., description="Token")
+    refresh_token: Optional[str] = Field(..., description="Token")
     token_type: str = Field(default="bearer", description="Type of token")
+
+
+class RefreshTokenRequest(BaseModel):
+    refresh_token: str = Field(..., description="Token")
 
 
 class VerifyTokenRequest(BaseModel):

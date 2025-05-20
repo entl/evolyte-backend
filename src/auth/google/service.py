@@ -49,11 +49,14 @@ class GoogleAuthProvider(AuthProvider):
                 # get expiration time from the token, deduct 60 seconds to prevent edge cases
                 # TODO: fetch created at from the token
                 expires_at = self._calculate_expiration_time(oauth_info.tokens.expires_in)
-                new_identity = self._perform_identity_linking(uow=uow,
-                                                              user_id=created_user.id, provider="google",
-                                                              provider_user_id=oauth_info.user.sub,
-                                                              access_token=oauth_info.tokens.access_token,
-                                                              expires_at=expires_at)
+                new_identity = self._perform_identity_linking(
+                    uow=uow,
+                    user_id=created_user.id,
+                    provider="google",
+                    provider_user_id=oauth_info.user.sub,
+                    access_token=oauth_info.tokens.access_token,
+                    expires_at=expires_at,
+                )
 
                 self.uow.commit()
 
@@ -64,10 +67,14 @@ class GoogleAuthProvider(AuthProvider):
             # user exists but not linked to identity
             with self.uow as uow:
                 expires_at = self._calculate_expiration_time(oauth_info.tokens.expires_in)
-                self._perform_identity_linking(uow, user_id=user.id, provider="google",
-                                               provider_user_id=oauth_info.user.sub,
-                                               access_token=oauth_info.tokens.access_token,
-                                               expires_at=expires_at)
+                self._perform_identity_linking(
+                    uow,
+                    user_id=user.id,
+                    provider="google",
+                    provider_user_id=oauth_info.user.sub,
+                    access_token=oauth_info.tokens.access_token,
+                    expires_at=expires_at,
+                )
 
             return self.auth_service.create_token_pair(user.id)
 
@@ -92,8 +99,12 @@ class GoogleAuthProvider(AuthProvider):
                 raise UserNotFoundException("Identity already exists")
 
             new_identity = self._perform_identity_linking(
-                uow=self.uow, user_id=oauth_info.user.user_id, provider=provider,
-                provider_user_id=oauth_info.user.sub, access_token=oauth_info.tokens.access_token, expires_at=None
+                uow=self.uow,
+                user_id=oauth_info.user.user_id,
+                provider=provider,
+                provider_user_id=oauth_info.user.sub,
+                access_token=oauth_info.tokens.access_token,
+                expires_at=None,
             )
 
             self.uow.commit()
@@ -104,10 +115,22 @@ class GoogleAuthProvider(AuthProvider):
     def rotate_refresh_token(self, refresh_token: str) -> str:
         pass
 
-    def _perform_identity_linking(self, uow: UnitOfWork, user_id: int, provider: str, provider_user_id: str,
-                                  access_token: str, expires_at: datetime) -> Identity:
-        identity = Identity(user_id=user_id, provider=provider, provider_user_id=provider_user_id,
-            access_token=access_token, expires_at=expires_at)
+    def _perform_identity_linking(
+        self,
+        uow: UnitOfWork,
+        user_id: int,
+        provider: str,
+        provider_user_id: str,
+        access_token: str,
+        expires_at: datetime,
+    ) -> Identity:
+        identity = Identity(
+            user_id=user_id,
+            provider=provider,
+            provider_user_id=provider_user_id,
+            access_token=access_token,
+            expires_at=expires_at,
+        )
 
         created_identity = uow.identities.create(identity)
 

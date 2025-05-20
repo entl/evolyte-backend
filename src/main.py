@@ -22,7 +22,7 @@ from src.settings import settings
 # index models
 from src.solar_panels.models import SolarPanel  # noqa
 from src.user.models import User  # noqa
-from src.auth.models import Identity # noqa
+from src.auth.models import Identity  # noqa
 
 
 warnings.simplefilter(action="ignore", category=FutureWarning)

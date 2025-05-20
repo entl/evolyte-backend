@@ -4,6 +4,7 @@ from typing import TypeVar
 from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.orm import Session
 
+from src.auth.repository import IdentityRepository
 from src.solar_panels.repository import SolarPanelRepository
 from src.user.repository import UserRepository
 
@@ -40,6 +41,7 @@ class UnitOfWork(UnitOfWorkBase):
         self.session = session
         self._user_repo = None
         self._solar_panel_repo = None
+        self._identity_repo = None
 
     def __enter__(self):
         return self
@@ -83,3 +85,9 @@ class UnitOfWork(UnitOfWorkBase):
         if self._solar_panel_repo is None:
             self._solar_panel_repo = SolarPanelRepository(self.session)
         return self._solar_panel_repo
+
+    @property
+    def identities(self):
+        if self._identity_repo is None:
+            self._identity_repo = IdentityRepository(self.session)
+        return self._identity_repo

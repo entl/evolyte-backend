@@ -43,6 +43,7 @@ def test_get_all_users_returns_all_users(mock_uow, sample_users):
     assert result[0].id == sample_users[0].id
     assert result[1].id == sample_users[1].id
 
+
 def test_get_user_by_id_returns_correct_user(mock_uow, sample_users):
     test_user = sample_users[0]
     mock_uow.users.get_by.return_value = test_user

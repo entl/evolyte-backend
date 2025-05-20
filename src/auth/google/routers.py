@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request, HTTPException
 from starlette import status
 
-from src.auth.schemas import (VerifyTokenRequest, RefreshTokenRequest, TokenPairResponse)
+from src.auth.schemas import VerifyTokenRequest, RefreshTokenRequest, TokenPairResponse
 from src.core.dependencies.auth import AuthServiceDep
 from src.auth.google.service import GoogleAuthProvider
 from src.core.dependencies.db import UowDep
@@ -17,5 +17,3 @@ async def auth_user(oauth_info: GoogleOAuth2Response, uow: UowDep, auth_service:
     token_pair = google_auth.authenticate(oauth_info=oauth_info)
 
     return token_pair
-
-

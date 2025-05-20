@@ -2,7 +2,8 @@ from typing import List, Optional
 
 from src.core.db.uow import UnitOfWork
 from src.core.exceptions.user import (
-    DuplicateEmailOrUsernameException,    UserNotFoundException,
+    DuplicateEmailOrUsernameException,
+    UserNotFoundException,
 )
 from src.core.utils import password_helper
 

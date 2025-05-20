@@ -13,6 +13,7 @@ class UserBase(BaseModel):
         full_name (str): The full name of the user.
 
     """
+
     full_name: Annotated[
         str,
         Field(min_length=1, max_length=128, description="The full name of the user"),

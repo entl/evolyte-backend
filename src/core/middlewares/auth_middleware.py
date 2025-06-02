@@ -1,6 +1,5 @@
 from typing import Tuple
 
-from pydantic import UUID4
 from starlette.authentication import AuthenticationBackend
 from starlette.middleware.authentication import (
     AuthenticationMiddleware as BaseAuthenticationMiddleware,
@@ -13,9 +12,9 @@ from src.schemas import CurrentUser
 
 
 class AuthBackend(AuthenticationBackend):
-    async def authenticate(self, conn: HTTPConnection) -> Tuple[bool, UUID4]:
+    async def authenticate(self, conn: HTTPConnection) -> Tuple[bool, CurrentUser]:
         current_user = CurrentUser()
-        authorization: str = conn.headers.get("Authorization")
+        authorization: str | None = conn.headers.get("Authorization")
         if not authorization:
             return False, current_user
 

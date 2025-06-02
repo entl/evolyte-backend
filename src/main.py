@@ -1,16 +1,20 @@
 # disable warning
 import warnings
+from contextlib import asynccontextmanager
 from typing import List
 
+import redis
 from fastapi import APIRouter, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware import Middleware
 from starlette.responses import JSONResponse
 
 from src.auth.routers import auth_router
+from src.enode.inverters.routers import enode_inverters_router
 from src.auth.google.routers import google_auth_router
 from src.core.exceptions.base import CustomException
 from src.core.middlewares.auth_middleware import AuthBackend, AuthenticationMiddleware
+from src.core.middlewares.rate_limiter_middleware import RateLimiterMiddleware
 from src.health.routers import health_router
 from src.predict.routers import predict_router
 from src.pvgis.routers import pvgis_router
@@ -41,18 +45,25 @@ def on_auth_error(request: Request, exc: Exception):
     )
 
 
-def make_middleware() -> List[Middleware]:
-    middleware = [
-        Middleware(
-            CORSMiddleware,
-            allow_origins=settings.cors_origins,
-            allow_credentials=True,
-            allow_methods=["*"],
-            allow_headers=["*"],
-        ),
-        Middleware(AuthenticationMiddleware, backend=AuthBackend(), on_error=on_auth_error),
-    ]
-    return middleware
+def add_middlewares(app_: FastAPI) -> None:
+    app_.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.cors_origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+    app_.add_middleware(
+        RateLimiterMiddleware,
+        redis_client=app_.state.redis,
+    )
+    app_.add_middleware(
+        AuthenticationMiddleware,
+        backend=AuthBackend(),
+        on_error=on_auth_error,
+    )
+
 
 
 def init_listeners(app_: FastAPI) -> None:
@@ -62,6 +73,16 @@ def init_listeners(app_: FastAPI) -> None:
             status_code=exc.code,
             content={"error_code": exc.error_code, "message": exc.message},
         )
+
+
+def init_redis(app_: FastAPI) -> None:
+    pool = redis.ConnectionPool(host=settings.redis_host, port=settings.redis_port, db=settings.redis_cache_db)
+    app_.state.redis = redis.Redis.from_pool(pool)
+
+    if app_.state.redis.ping():
+        print("Redis connection established successfully.")
+    else:
+        raise Exception("Failed to connect to Redis.")
 
 
 def init_routers(app_: FastAPI) -> None:
@@ -74,12 +95,23 @@ def init_routers(app_: FastAPI) -> None:
     prefix_router.include_router(pvgis_router)
     prefix_router.include_router(predict_router)
     prefix_router.include_router(weather_router)
+    prefix_router.include_router(enode_inverters_router)
 
     app_.include_router(prefix_router)
 
 
+@asynccontextmanager
+async def lifespan(app_: FastAPI):
+    init_redis(app_)
+    yield
+    await app_.state.redis.close()
+
+
 def create_app():
-    app_ = FastAPI(middleware=make_middleware())
+    app_ = FastAPI()
+    init_redis(app_)
+
+    add_middlewares(app_=app_)
 
     init_listeners(app_=app_)
     init_routers(app_=app_)

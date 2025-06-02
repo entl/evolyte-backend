@@ -48,7 +48,7 @@ class AuthService:
 
         if not user:
             raise UserNotFoundException()
-        if not password_helper.verify(password, user.password):
+        if not password_helper.verify(password, str(user.password)):
             raise PasswordDoesNotMatchException()
 
         return self.create_token_pair(user_id=user.id)

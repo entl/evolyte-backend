@@ -1,10 +1,12 @@
 from typing import Annotated
 
-from fastapi import Depends
+from fastapi import Depends, Request
 from sqlalchemy.orm import Session
+from redis import Redis
 
 from src.core.db.session import SessionFactory
 from src.core.db.uow import UnitOfWork
+from src.redis_repository import RedisBaseRepository
 
 
 def get_db_session():
@@ -19,3 +21,19 @@ def get_uow(session: DBSessionDep):
 
 
 UowDep = Annotated[UnitOfWork, Depends(get_uow)]
+
+
+def get_redis_client(request: Request):
+    return request.app.state.redis
+
+
+RedisClientDep = Annotated[Redis, Depends(get_redis_client)]
+
+
+def get_redis_repository(redis_client: RedisClientDep):
+    return RedisBaseRepository(redis_client)
+
+
+RedisRepositoryDep = Annotated[RedisBaseRepository, Depends(get_redis_repository)]
+
+

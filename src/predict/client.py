@@ -7,6 +7,7 @@ from src.predict.schemas import (
     PredictionClientResponse,
 )
 from src.settings import settings
+from src.core.exceptions.prediction import PredictionException, BatchPredictionException
 
 
 class PredictionClient:
@@ -23,7 +24,7 @@ class PredictionClient:
             response.raise_for_status()
             return PredictionClientResponse(**response.json())
         except requests.RequestException as e:
-            raise RuntimeError(f"Failed to fetch prediction: {e}")
+            raise PredictionException("Failed to fetch prediction") from e
 
     def batch_predict(self, request: BatchPredictionClientRequest) -> BatchPredictionClientResponse:
         try:
@@ -36,4 +37,4 @@ class PredictionClient:
             test = BatchPredictionClientResponse.model_validate(response.json(), from_attributes=True)
             return test
         except requests.RequestException as e:
-            raise RuntimeError(f"Failed to fetch batch prediction: {e}")
+            raise BatchPredictionException("Failed to fetch batch prediction") from e

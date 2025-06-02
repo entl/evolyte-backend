@@ -1,12 +1,9 @@
 from http import HTTPStatus
 
-from fastapi import status
-
-
 class CustomException(Exception):
-    code = status.HTTP_502_BAD_GATEWAY
-    error_code = status.HTTP_502_BAD_GATEWAY
-    message = status.HTTP_502_BAD_GATEWAY
+    code = HTTPStatus.INTERNAL_SERVER_ERROR
+    error_code = HTTPStatus.INTERNAL_SERVER_ERROR
+    message = "An unexpected error occurred."
 
     def __init__(self, message=None):
         if message:

@@ -12,6 +12,7 @@ def mock_uow(mock_user_repository, mock_solar_panel_repository):
     uow.rollback.return_value = None
     type(uow).users = PropertyMock(return_value=mock_user_repository)
     type(uow).solar_panels = PropertyMock(return_value=mock_solar_panel_repository)
+    type(uow).identities = PropertyMock(return_value=mock_identity_repository)
     return uow
 
 
@@ -41,3 +42,14 @@ def mock_solar_panel_repository():
     mock_solar_panel_repository.get_nearby_panels.return_value = []
 
     return mock_solar_panel_repository
+
+
+@pytest.fixture
+def mock_identity_repository():
+    mock_identity_repository = MagicMock()
+    mock_identity_repository.get_by.return_value = None
+    mock_identity_repository.create.return_value = None
+    mock_identity_repository.update.return_value = None
+    mock_identity_repository.delete.return_value = None
+
+    return mock_identity_repository

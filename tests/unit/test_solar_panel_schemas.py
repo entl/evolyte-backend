@@ -102,6 +102,7 @@ def test_solar_panel_create_inherits_base():
 
 def test_solar_panel_update_same_as_base():
     payload = {
+        "id": 4,
         "serial_number": "SP-004",
         "name": "West Panel",
         "capacity_kw": 2.5,

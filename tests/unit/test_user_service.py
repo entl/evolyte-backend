@@ -76,8 +76,6 @@ def test_create_user_raises_exception_on_duplicate_email(mock_uow):
         password="12345678",
         password_confirmation="12345678",
         full_name="test user",
-        created_at=datetime.now(),
-        updated_at=datetime.now(),
     )
 
     with pytest.raises(DuplicateEmailOrUsernameException):
@@ -105,8 +103,6 @@ def test_create_user_raises_success(mock_uow):
         password="12345678",
         password_confirmation="12345678",
         full_name="test user",
-        created_at=datetime.now(),
-        updated_at=datetime.now(),
     )
 
     result = service.create_user(user_create)

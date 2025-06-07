@@ -1,4 +1,5 @@
 import datetime
+from typing import Callable, Optional
 
 import pandas as pd
 
@@ -11,12 +12,21 @@ from src.weather.schemas import HourlyWeatherData, WeatherRequest, WeatherRespon
 
 
 class WeatherService:
-    def __init__(self, weather_client: WeatherClient):
+    def __init__(
+        self,
+        weather_client: WeatherClient,
+        clock: Optional[Callable[[], datetime.date]] = None,
+        historical_days_cutoff: int = 5,
+        max_forecast_days: int = 16,
+    ):
         self.weather_client = weather_client
+        self.clock = clock if clock is not None else datetime.date.today
+        self.historical_days_cutoff = historical_days_cutoff
+        self.max_forecast_days = max_forecast_days
 
     def get_weather(self, request: WeatherRequest) -> WeatherResponse:
-        current_date = datetime.date.today()
-        historical_data_cutoff = current_date - datetime.timedelta(days=5)
+        current_date = self.clock().today()
+        historical_data_cutoff = current_date - datetime.timedelta(days=self.historical_days_cutoff)
 
         if not self._is_data_within_16_days(current_date, request.end_date) or not self._is_data_within_16_days(
             current_date, request.start_date
@@ -128,5 +138,5 @@ class WeatherService:
         return forecast_weather_data
 
     def _is_data_within_16_days(self, today_date, date_to_verify):
-        max_allowed_date = today_date + datetime.timedelta(days=16)
+        max_allowed_date = today_date + datetime.timedelta(days=self.max_forecast_days)
         return date_to_verify <= max_allowed_date

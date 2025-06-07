@@ -1,7 +1,6 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, status
-from pydantic import UUID4
 
 from src.core.dependencies.permission import (
     IsAdmin,
@@ -13,7 +12,10 @@ from src.core.dependencies.user import UserServiceDep
 from src.core.exceptions.user import InsufficientPermissions, UserNotFoundException
 from src.schemas import CurrentUser
 from src.user.schemas import UserCreate, UserResponse, UserUpdate
-from src.user.service import UserService
+from src.logger import get_logger
+
+# Configure logger for this module
+logger = get_logger(__name__)
 
 users_router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -36,7 +38,9 @@ def get_all_users(user_service: UserServiceDep):
     Returns:
         list[UserResponse]: A list of all users in the database.
     """
+    logger.info("Fetching all users")
     users = user_service.get_all_users()
+    logger.info(f"Found {len(users)} users")
     return users
 
 
@@ -62,6 +66,7 @@ def get_current_user(
     Returns:
         UserResponse: The currently authenticated user.
     """
+    logger.info(f"Fetching current user: {current_user.id}")
     return user_service.get_user_by_id(user_id=current_user.id)
 
 
@@ -84,10 +89,11 @@ def get_user_by_id(user_id: int, user_service: UserServiceDep):
     Returns:
         UserResponse: The user with the specified ID.
     """
+    logger.info(f"Fetching user by ID: {user_id}")
     user = user_service.get_user_by_id(user_id=user_id)
     if not user:
+        logger.warning(f"User not found: {user_id}")
         raise UserNotFoundException()
-
     return user
 
 
@@ -107,7 +113,10 @@ def create_user(user_service: UserServiceDep, user: UserCreate):
     Returns:
         UserResponse: Created user data.
     """
-    return user_service.create_user(user=user)
+    logger.info(f"Creating user: {getattr(user, 'email', user)}")
+    created_user = user_service.create_user(user=user)
+    logger.info(f"User created with ID: {created_user.id}")
+    return created_user
 
 
 @users_router.patch(
@@ -131,16 +140,20 @@ def update_user(
     Returns:
         UserResponse: Updated user data.
     """
+    logger.info(f"Updating user: {updated_user.id} by {current_user.id}")
     if current_user.id == updated_user.id or Permissions.IsAdmin in current_user.permissions:
-        return user_service.update_user(updated_user)
+        updated = user_service.update_user(updated_user)
+        logger.info(f"User updated: {updated_user.id}")
+        return updated
     else:
+        logger.warning(f"Insufficient permissions for user: {current_user.id} to update {updated_user.id}")
         raise InsufficientPermissions()
 
 
 @users_router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT, dependencies=[])
 def delete_user(
     user_service: UserServiceDep,
-    user_id: UUID4,
+    user_id: int,
     current_user: Annotated[CurrentUser, Depends(PermissionDependencyHTTP([IsAuthenticated, IsAdmin]))],
 ):
     """
@@ -154,7 +167,10 @@ def delete_user(
     Returns:
         None
     """
+    logger.info(f"Deleting user: {user_id} by {current_user.id}")
     if current_user.id == user_id or Permissions.IsAdmin in current_user.permissions:
         user_service.delete_user(user_id=user_id)
+        logger.info(f"User deleted: {user_id}")
     else:
+        logger.warning(f"Insufficient permissions for user: {current_user.id} to delete {user_id}")
         raise InsufficientPermissions()

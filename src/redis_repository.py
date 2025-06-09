@@ -14,12 +14,7 @@ class RedisBaseRepository:
     def _format_key(self, key: str) -> str:
         return f"{self.namespace}{key}"
 
-    def create(
-        self,
-        key: str,
-        value: Union[str, bytes],
-        ex: Optional[int] = None
-    ) -> bool:
+    def create(self, key: str, value: Union[str, bytes], ex: Optional[int] = None) -> bool:
         """
         Set the key to value only if it does not already exist (NX).
         :param ex: expiration in seconds
@@ -33,12 +28,7 @@ class RedisBaseRepository:
         """
         return self.client.get(self._format_key(key))
 
-    def update(
-        self,
-        key: str,
-        value: Union[str, bytes],
-        ex: Optional[int] = None
-    ) -> bool:
+    def update(self, key: str, value: Union[str, bytes], ex: Optional[int] = None) -> bool:
         """
         Unconditionally set the key to value (overwrite).
         :returns: True if successful
@@ -58,11 +48,7 @@ class RedisBaseRepository:
         """
         return self.client.exists(self._format_key(key)) == 1
 
-    def scan(
-        self,
-        pattern: str = "*",
-        count: int = 100
-    ) -> Iterator[str]:
+    def scan(self, pattern: str = "*", count: int = 100) -> Iterator[str]:
         """
         Iterate all keys matching the pattern within this namespace.
         Yields the un-prefixed key names.
@@ -78,17 +64,13 @@ class RedisBaseRepository:
             if cursor == 0:
                 break
 
-    def incr(
-        self,
-        key: str,
-        amount: int = 1
-    ) -> int:
+    def incr(self, key: str, amount: int = 1) -> int:
         """
         Increment the integer value stored at key by amount.
         :returns: new value after increment
         """
         return self.client.incr(self._format_key(key), amount)
-    
+
     def expire(self, key: str, seconds: int) -> bool:
         """
         Set the expiration time for a key.
@@ -96,7 +78,7 @@ class RedisBaseRepository:
         :returns: True if the timeout was set, False if the key does not exist
         """
         return self.client.expire(self._format_key(key), seconds)
-    
+
     def ttl(self, key: str) -> Optional[int]:
         """
         Get the time to live for a key.

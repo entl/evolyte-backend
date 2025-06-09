@@ -40,7 +40,7 @@ class SolarPanelCreate(SolarPanelBase):
 
 
 class SolarPanelUpdate(SolarPanelBase):
-    pass
+    id: int = Field(..., example=1)
 
 
 class SolarPanelResponse(SolarPanelBase):

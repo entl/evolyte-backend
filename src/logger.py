@@ -20,7 +20,7 @@ LOGGING_CONFIG = {
 }
 
 
-def setup_logging(level: int = None) -> None:
+def setup_logging(level: int | None = None) -> None:
     """
     Configure the root logger with an ECS formatter on stdout.
     Call once at application startup.
@@ -33,9 +33,9 @@ def setup_logging(level: int = None) -> None:
     dictConfig(LOGGING_CONFIG)
 
 
-def get_logger(name: str = None) -> logging.Logger:
+def get_logger(name: str | None = None) -> logging.Logger:
     """
-    Return a logger with the given name (default: caller’s module name).
+    Return a logger with the given name (default: caller`s module name).
     Modules should do:
         logger = get_logger(__name__)
     """

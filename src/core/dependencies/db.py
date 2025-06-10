@@ -35,5 +35,3 @@ def get_redis_repository(redis_client: RedisClientDep):
 
 
 RedisRepositoryDep = Annotated[RedisBaseRepository, Depends(get_redis_repository)]
-
-

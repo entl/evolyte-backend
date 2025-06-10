@@ -1,5 +1,6 @@
 from http import HTTPStatus
 
+
 class CustomException(Exception):
     code = HTTPStatus.INTERNAL_SERVER_ERROR
     error_code = HTTPStatus.INTERNAL_SERVER_ERROR

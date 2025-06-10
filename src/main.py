@@ -10,7 +10,6 @@ from starlette.middleware import Middleware
 from starlette.responses import JSONResponse
 
 from src.auth.routers import auth_router
-from src.enode.inverters.routers import enode_inverters_router
 from src.auth.google.routers import google_auth_router
 from src.core.exceptions.base import CustomException
 from src.core.middlewares.auth_middleware import AuthBackend, AuthenticationMiddleware
@@ -22,12 +21,14 @@ from src.user.routers import users_router
 from src.weather.routers import weather_router
 from src.solar_panels.routers import solar_panels_router
 from src.settings import settings
+from src.logger import setup_logging, get_logger
 
 # index models
 from src.solar_panels.models import SolarPanel  # noqa
 from src.user.models import User  # noqa
 from src.auth.models import Identity  # noqa
 
+logger = get_logger(__name__)
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
@@ -46,6 +47,7 @@ def on_auth_error(request: Request, exc: Exception):
 
 
 def add_middlewares(app_: FastAPI) -> None:
+    logger.debug("Adding middlewares to the FastAPI application")
     app_.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,
@@ -63,7 +65,7 @@ def add_middlewares(app_: FastAPI) -> None:
         backend=AuthBackend(),
         on_error=on_auth_error,
     )
-
+    logger.debug("Middlewares added successfully")
 
 
 def init_listeners(app_: FastAPI) -> None:
@@ -80,12 +82,14 @@ def init_redis(app_: FastAPI) -> None:
     app_.state.redis = redis.Redis.from_pool(pool)
 
     if app_.state.redis.ping():
-        print("Redis connection established successfully.")
+        logger.debug("Redis connection established successfully.")
     else:
+        logger.error("Failed to connect to Redis.")
         raise Exception("Failed to connect to Redis.")
 
 
 def init_routers(app_: FastAPI) -> None:
+    logger.debug("Initializing routers for the FastAPI application")
     prefix_router = APIRouter(prefix="/api/v1")
     prefix_router.include_router(health_router)
     prefix_router.include_router(users_router)
@@ -95,20 +99,24 @@ def init_routers(app_: FastAPI) -> None:
     prefix_router.include_router(pvgis_router)
     prefix_router.include_router(predict_router)
     prefix_router.include_router(weather_router)
-    prefix_router.include_router(enode_inverters_router)
 
     app_.include_router(prefix_router)
+    logger.debug("Routers initialized successfully")
 
 
 @asynccontextmanager
 async def lifespan(app_: FastAPI):
     init_redis(app_)
+    logger.debug("Application startup: Initializing Redis connection")
     yield
+    logger.debug("Application shutdown: Closing Redis connection")
     await app_.state.redis.close()
 
 
 def create_app():
     app_ = FastAPI()
+    setup_logging()
+    logger.error("test error log")
     init_redis(app_)
 
     add_middlewares(app_=app_)

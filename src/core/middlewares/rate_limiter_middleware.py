@@ -3,6 +3,7 @@ from fastapi import Request, Response
 from redis import Redis
 from src.redis_repository import RedisBaseRepository
 
+
 class RateLimiterMiddleware(BaseHTTPMiddleware):
     # TODO: Assess benefits of decorator rate limiting
     def __init__(self, app, redis_client: Redis):
@@ -10,8 +11,7 @@ class RateLimiterMiddleware(BaseHTTPMiddleware):
         self.rate_limit = 100  # Example limit: 100 requests per minute
         self.time_window = 60
         self.namespace = "rate_limiter_middleware"
-        self.redis_repository = RedisBaseRepository(redis_client, 
-                                                    namespace=self.namespace)
+        self.redis_repository = RedisBaseRepository(redis_client, namespace=self.namespace)
 
     async def dispatch(self, request: Request, call_next):
         client_ip = request.client.host

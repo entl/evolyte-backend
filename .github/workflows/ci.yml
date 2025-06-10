@@ -27,6 +27,16 @@ jobs:
       JWT_REFRESH_TOKEN_EXPIRATION_TIME: ${{secrets.JWT_REFRESH_TOKEN_EXPIRATION_TIME}}
       GOOGLE_CLIENT_ID: ${{secrets.GOOGLE_CLIENT_ID}}
       GOOGLE_CLIENT_SECRET: ${{secrets.GOOGLE_CLIENT_SECRET}}
+      ENODE_CLIENT_ID: ${{secrets.ENODE_CLIENT_ID}}
+      ENODE_CLIENT_SECRET: ${{secrets.ENODE_CLIENT_SECRET}}
+      ENODE_API_URL: ${{secrets.ENODE_API_URL}}
+      ENODE_OAUTH_URL: ${{secrets.ENODE_OAUTH_URL}}
+      REDIS_HOST: ${{secrets.REDIS_HOST}}
+      REDIS_PORT: ${{secrets.REDIS_PORT}}
+      REDIS_PASSWORD: ${{secrets.REDIS_PASSWORD}}
+      REDIS_CACHE_DB: ${{secrets.REDIS_CACHE_DB}}
+      REDIS_CELERY_BROKER_DB: ${{secrets.REDIS_CELERY_BROKER_DB}}
+      REDIS_CELERY_BACKEND_DB: ${{secrets.REDIS_CELERY_RESULT_DB}}
       ENV: ${{secrets.ENV}}
       ML_API_URL: ${{secrets.ML_API_URL}}
       CORS_ORIGINS: ${{secrets.CORS_ORIGINS}}

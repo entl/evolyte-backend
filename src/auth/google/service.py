@@ -60,7 +60,7 @@ class GoogleAuthProvider(AuthProvider):
 
                 self.uow.commit()
 
-            return self.auth_service.create_token_pair(created_user.id)
+                return self.auth_service.create_token_pair(created_user.id)
 
         # user exists but not linked to identity
         if user and not identity:

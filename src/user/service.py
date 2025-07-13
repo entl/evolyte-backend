@@ -16,15 +16,18 @@ class UserService:
         self.uow = uow
 
     def get_all_users(self) -> List[UserResponse]:
-        users = self.uow.users.get_all()
-        return [UserResponse.model_validate(user) for user in users]
+        with self.uow:
+            users = self.uow.users.get_all()
+            return [UserResponse.model_validate(user) for user in users]
 
     def get_user_by_id(self, user_id: int) -> Optional[UserResponse]:
-        user = self.uow.users.get_by(id=user_id)
-        return UserResponse.model_validate(user) if user else None
+        with self.uow:
+            user = self.uow.users.get_by(id=user_id)
+            return UserResponse.model_validate(user) if user else None
 
     def get_user_by_email(self, email: str) -> Optional[UserResponse]:
-        user = self.uow.users.get_by(email=email)
+        with self.uow:
+            user = self.uow.users.get_by(email=email)
         return UserResponse.model_validate(user) if user else None
 
     def create_user(self, user: UserCreate) -> UserResponse:
@@ -59,9 +62,10 @@ class UserService:
             return UserResponse.model_validate(updated_user)
 
     def is_admin(self, user_id: int) -> bool:
-        user = self.uow.users.get_by(id=user_id)
-        if not user:
-            raise UserNotFoundException()
+        with self.uow:
+            user = self.uow.users.get_by(id=user_id)
+            if not user:
+                raise UserNotFoundException()
 
         if user.role == "admin":
             return True

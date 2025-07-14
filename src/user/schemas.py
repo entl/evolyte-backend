@@ -3,6 +3,10 @@ from typing import Annotated, Optional
 
 from pydantic import BaseModel, EmailStr, Field, model_validator
 
+class UserRoles:
+    ADMIN = "ADMIN"
+    USER = "USER"
+
 
 class UserBase(BaseModel):
     """
@@ -18,6 +22,7 @@ class UserBase(BaseModel):
         str,
         Field(min_length=1, max_length=128, description="The full name of the user"),
     ]
+    role: Annotated[str, Field(default=UserRoles.USER, description="The role of the user")]
 
 
 class UserCreate(UserBase):

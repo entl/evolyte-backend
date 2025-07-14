@@ -5,6 +5,7 @@ from src.core.exceptions.user import UserNotFoundException, PasswordDoesNotMatch
 from src.core.utils import password_helper
 from src.core.utils.token_helper import TokenHelper
 from src.auth.schemas import TokenPairResponse, TokenPayload
+from src.user.schemas import UserRoles
 from src.core.exceptions.token import TokenValidationError
 from src.settings import settings
 
@@ -16,9 +17,9 @@ class AuthService:
         self._access_token_expiry = settings.jwt_token_expiration_time
         self._refresh_token_expiry = settings.jwt_refresh_token_expiration_time
 
-    def create_token_pair(self, user_id: int) -> TokenPairResponse:
-        access_token = self._create_access_token(user_id=user_id)
-        refresh_token = self._create_refresh_token(user_id=user_id)
+    def create_token_pair(self, user_id: int, role: UserRoles | str) -> TokenPairResponse:
+        access_token = self._create_access_token(user_id=user_id, role=(role if isinstance(role, str) else role.value))
+        refresh_token = self._create_refresh_token(user_id=user_id, role=(role if isinstance(role, str) else role.value))
 
         return TokenPairResponse(
             access_token=access_token,
@@ -51,19 +52,21 @@ class AuthService:
         if not password_helper.verify(password, str(user.password)):
             raise PasswordDoesNotMatchException()
 
-        return self.create_token_pair(user_id=user.id)
+        return self.create_token_pair(user_id=user.id, role=user.role)
 
-    def _create_access_token(self, user_id: int) -> str:
+    def _create_access_token(self, user_id: int, **kwargs) -> str:
         payload = {
             "user_id": user_id,
+            **kwargs,
             "sub": "access",
         }
         return self._token_helper.encode(payload, self._access_token_expiry)
 
-    def _create_refresh_token(self, user_id: int) -> str:
+    def _create_refresh_token(self, user_id: int, **kwargs) -> str:
         payload = {
             "user_id": user_id,
             "sub": "refresh",
+            **kwargs,
         }
         return self._token_helper.encode(payload, self._refresh_token_expiry)
 

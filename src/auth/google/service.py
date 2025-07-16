@@ -60,7 +60,7 @@ class GoogleAuthProvider(AuthProvider):
 
                 self.uow.commit()
 
-                return self.auth_service.create_token_pair(created_user.id)
+                return self.auth_service.create_token_pair(created_user.id, role=created_user.role)
 
         # user exists but not linked to identity
         if user and not identity:
@@ -76,11 +76,11 @@ class GoogleAuthProvider(AuthProvider):
                     expires_at=expires_at,
                 )
 
-            return self.auth_service.create_token_pair(user.id)
+            return self.auth_service.create_token_pair(user.id, role=user.role)
 
         # if user AND identity exist, just return the token pair
         if user and identity:
-            return self.auth_service.create_token_pair(user.id)
+            return self.auth_service.create_token_pair(user.id, role=user.role)
 
     def verify_id_token(self, token: str):
         try:

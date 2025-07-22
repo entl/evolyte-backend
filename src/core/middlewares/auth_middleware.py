@@ -46,10 +46,10 @@ class AuthBackend(AuthenticationBackend):
         role: UserRoles | str | None = conn.headers.get("X-User-Role")
         if not user_id:
             return False, current_user
-        
+
         if not role:
             return False, current_user
-        
+
         current_user.id = user_id
         current_user.role = role
 

@@ -134,7 +134,7 @@ class IsAdmin(BasePermission):
         role = request.headers.get("X-User-Role")
         if role and role.lower() == "admin":
             return True
-        
+
         return False
 
 

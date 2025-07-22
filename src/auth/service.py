@@ -19,7 +19,9 @@ class AuthService:
 
     def create_token_pair(self, user_id: int, role: UserRoles | str) -> TokenPairResponse:
         access_token = self._create_access_token(user_id=user_id, role=(role if isinstance(role, str) else role.value))
-        refresh_token = self._create_refresh_token(user_id=user_id, role=(role if isinstance(role, str) else role.value))
+        refresh_token = self._create_refresh_token(
+            user_id=user_id, role=(role if isinstance(role, str) else role.value)
+        )
 
         return TokenPairResponse(
             access_token=access_token,

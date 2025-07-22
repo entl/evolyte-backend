@@ -3,6 +3,7 @@ from typing import Annotated, Optional
 
 from pydantic import BaseModel, EmailStr, Field, model_validator
 
+
 class UserRoles:
     ADMIN = "ADMIN"
     USER = "USER"

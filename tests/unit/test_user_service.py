@@ -4,7 +4,7 @@ import pytest
 
 from src.core.exceptions.user import DuplicateEmailOrUsernameException
 from src.user.models import User
-from src.user.schemas import UserCreate, UserUpdate
+from src.user.schemas import UserCreate, UserRoles, UserUpdate
 from src.user.service import UserService
 
 
@@ -93,6 +93,7 @@ def test_create_user_raises_success(mock_uow):
         email="test@example.com",
         password="hashedpass123",
         full_name="test user",
+        role=UserRoles.USER,
         created_at=datetime.now(),
         updated_at=datetime.now(),
     )
@@ -121,6 +122,7 @@ def test_update_user_success(mock_uow):
         email="old@example.com",
         password="oldpass123",
         full_name="Old Name",
+        role=UserRoles.USER,
         created_at=datetime.now(),
         updated_at=datetime.now(),
     )
@@ -136,6 +138,7 @@ def test_update_user_success(mock_uow):
         email="new@example.com",
         password="oldpass123",
         full_name="New Name",
+        role=UserRoles.USER,
         created_at=test_user.created_at,
         updated_at=datetime.now(),
     )

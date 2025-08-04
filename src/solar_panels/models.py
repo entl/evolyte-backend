@@ -18,7 +18,7 @@ class SolarPanelHourlyRecord(Base):
     __tablename__ = "solar_panel_hourly_records"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    solar_panel_id = Column(Integer, ForeignKey("solar_panels.id"), nullable=False)
+    inverter_id = Column(Integer, ForeignKey("inverters.id"), nullable=False)
     timestamp = Column(DateTime, nullable=False)
 
     # Power Production Data
@@ -43,14 +43,14 @@ class SolarPanelHourlyRecord(Base):
     clear_sky_index = Column(Float, nullable=True)
 
     # Metadata
-    created_at = Column(DateTime, default=func.now())
-    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+    created_at = Column(DateTime(timezone=True), default=func.now(), nullable=False)
+    updated_at = Column(DateTime(timezone=True), default=func.now(), onupdate=func.now(), nullable=False)
 
     # Relationships
-    solar_panel = relationship("SolarPanel", back_populates="hourly_records")
+    inverter = relationship("Inverter", back_populates="hourly_records")
 
     def __repr__(self):
-        return f"<SolarPanelHourlyRecord(id={self.id}, panel_id={self.solar_panel_id}, timestamp={self.timestamp}, power_output={self.power_output_kw}kW)>"
+        return f"<SolarPanelHourlyRecord(id={self.id}, inverter_id={self.inverter_id}, timestamp={self.timestamp}, power_output={self.power_output_kw}kW)>"
 
 
 class SolarPanel(Base):
@@ -85,10 +85,11 @@ class SolarPanel(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     user = relationship("User", back_populates="solar_panels")
 
-    hourly_records = relationship("SolarPanelHourlyRecord", back_populates="solar_panel")
+    inverter_id = Column(Integer, ForeignKey("inverters.id"), nullable=True)
+    inverter = relationship("Inverter", back_populates="solar_panels")
 
-    created_at = Column(DateTime, default=func.now())
-    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+    created_at = Column(DateTime(timezone=True), default=func.now(), nullable=False)
+    updated_at = Column(DateTime(timezone=True), default=func.now(), onupdate=func.now(), nullable=False)
 
     def __repr__(self):
         return f"""<SolarPanel(
@@ -100,5 +101,6 @@ class SolarPanel(Base):
             status="{self.status.name}",
             location="{self.location}",
             user_id={self.user_id}, created_at="{self.created_at.isoformat() if self.created_at else None}",
+            inverter_id={self.inverter_id},
             updated_at="{self.updated_at.isoformat() if self.updated_at else None}"
         )>"""

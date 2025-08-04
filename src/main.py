@@ -27,6 +27,7 @@ from src.logger import setup_logging, get_logger
 from src.solar_panels.models import SolarPanel  # noqa
 from src.user.models import User  # noqa
 from src.auth.models import Identity  # noqa
+from src.inverters.models import Inverter  # noqa
 
 logger = get_logger(__name__)
 
@@ -48,13 +49,6 @@ def on_auth_error(request: Request, exc: Exception):
 
 def add_middlewares(app_: FastAPI) -> None:
     logger.debug("Adding middlewares to the FastAPI application")
-    app_.add_middleware(
-        CORSMiddleware,
-        allow_origins=settings.cors_origins,
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
 
     app_.add_middleware(
         RateLimiterMiddleware,

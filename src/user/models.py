@@ -25,8 +25,8 @@ class User(Base):
     solar_panels = relationship("SolarPanel", back_populates="user")
     identities = relationship("Identity", back_populates="user")
 
-    created_at = Column(DateTime, default=func.now())
-    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+    created_at = Column(DateTime(timezone=True), default=func.now(), nullable=False)
+    updated_at = Column(DateTime(timezone=True), default=func.now(), onupdate=func.now(), nullable=False)
 
     def __repr__(self):
         return f"<User(id={self.id}, username={self.username}, email={self.email})>"

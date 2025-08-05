@@ -18,7 +18,7 @@ predict_router = APIRouter(prefix="/predict", tags=["Predict"])
 predict_logger = get_logger(__name__)
 
 
-@predict_router.get("/", response_model=PredictionResponse)
+@predict_router.get("", response_model=PredictionResponse)
 def predict_solar_panel_output(
     request: Annotated[PredictionRequest, Query()],
     prediction_service: PredictionServiceDep,

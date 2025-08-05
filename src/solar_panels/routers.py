@@ -54,12 +54,7 @@ def update_solar_panel(
     return panel
 
 
-@solar_panels_router.get("/user/{user_id}", response_model=List[SolarPanelResponse])
-def get_user_solar_panels(user_id: int, solar_panel_service: SolarPanelServiceDep):
-    solar_logger.info(f"Getting solar panels for user {user_id}")
-    panels = solar_panel_service.get_solar_panels_by_user_id(user_id)
-    solar_logger.info(f"Found {len(panels)} panels for user {user_id}")
-    return panels
+
 
 
 @solar_panels_router.get("/status/{status}", response_model=List[SolarPanelResponse])

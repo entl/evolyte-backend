@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, List
 
 from fastapi import APIRouter, Depends, status
 
@@ -8,9 +8,11 @@ from src.core.dependencies.permission import (
     PermissionDependencyHTTP,
     Permissions,
 )
+from src.core.dependencies.solar_panels import SolarPanelServiceDep
 from src.core.dependencies.user import UserServiceDep
 from src.core.exceptions.user import InsufficientPermissions, UserNotFoundException
 from src.schemas import CurrentUser
+from src.solar_panels.schemas import SolarPanelResponse
 from src.user.schemas import UserCreate, UserResponse, UserUpdate
 from src.logger import get_logger
 
@@ -174,3 +176,11 @@ def delete_user(
     else:
         logger.warning(f"Insufficient permissions for user: {current_user.id} to delete {user_id}")
         raise InsufficientPermissions()
+
+
+@users_router.get("/{user_id}/solar-panels", response_model=List[SolarPanelResponse])
+def get_user_solar_panels(user_id: int, solar_panel_service: SolarPanelServiceDep):
+    logger.info(f"Getting solar panels for user {user_id}")
+    panels = solar_panel_service.get_solar_panels_by_user_id(user_id)
+    logger.info(f"Found {len(panels)} panels for user {user_id}")
+    return panels
